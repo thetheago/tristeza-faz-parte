@@ -1,350 +1,1520 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tristeza Faz Parte — Nani Ely</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tristeza Faz Parte — Nani Ely</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-    :root {
-      --bg: #0d0d0d;
-      --surface: #161616;
-      --border: #2a2a2a;
-      --red: #c0392b;
-      --red-muted: #7a2320;
-      --text: #e8e0d8;
-      --text-muted: #6b6560;
-      --page-shadow: 0 8px 40px rgba(0,0,0,0.8);
-    }
+:root{
+  --bg:#0d0d0d;
+  --surface:#111;
+  --text:#ddd5cc;
+  --muted:#5a534e;
+  --red:#c0392b;
+  --red2:#7a2320;
+  --border:#1e1e1e;
+  --max:660px;
+}
 
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Georgia', 'Times New Roman', serif;
-      overflow: hidden;
-    }
+html{scroll-behavior:smooth}
 
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 52px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      z-index: 10;
-      padding: 0 16px;
-    }
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'EB Garamond',Georgia,serif;
+  font-size:19px;
+  line-height:1.9;
+  overflow-x:hidden;
+}
 
-    .title-bar {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-    }
+/* grain overlay */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size:200px;
+  opacity:.035;
+  pointer-events:none;
+  z-index:9999;
+}
 
-    .book-title {
-      font-size: 15px;
-      font-weight: bold;
-      letter-spacing: 0.05em;
-      color: var(--text);
-    }
+/* progress bar */
+#bar{
+  position:fixed;
+  top:0;left:0;
+  height:2px;
+  width:0%;
+  background:var(--red);
+  z-index:200;
+  transition:width .1s linear;
+}
 
-    .book-title span {
-      color: var(--red);
-    }
+/* header */
+header{
+  position:sticky;
+  top:0;
+  background:rgba(13,13,13,.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+  padding:14px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  z-index:100;
+}
 
-    .book-author {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-style: italic;
-      letter-spacing: 0.08em;
-    }
+.hlogo{
+  font-family:'Playfair Display',serif;
+  font-size:13px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--text);
+  text-decoration:none;
+}
+.hlogo em{color:var(--red);font-style:normal}
 
-    .divider {
-      width: 1px;
-      height: 20px;
-      background: var(--border);
-    }
+#toc-btn{
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  cursor:pointer;
+  padding:6px 0;
+  transition:color .2s;
+}
+#toc-btn:hover{color:var(--text)}
 
-    #viewer {
-      position: fixed;
-      top: 52px;
-      bottom: 64px;
-      left: 0;
-      right: 0;
-      overflow-y: auto;
-      overflow-x: auto;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 16px 8px;
-      background: var(--bg);
-      -webkit-overflow-scrolling: touch;
-    }
+/* toc drawer */
+#toc{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(12px);
+  z-index:150;
+  overflow-y:auto;
+  padding:60px 32px 40px;
+  transform:translateX(100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+#toc.open{transform:translateX(0)}
 
-    #canvas-wrapper {
-      position: relative;
-      display: inline-block;
-      box-shadow: var(--page-shadow);
-    }
+#toc-close{
+  position:absolute;
+  top:20px;right:24px;
+  background:none;border:none;
+  color:var(--muted);
+  font-size:22px;cursor:pointer;
+}
+#toc-close:hover{color:var(--text)}
 
-    canvas#pdf-canvas {
-      display: block;
-      background: white;
-    }
+#toc h2{
+  font-family:'Playfair Display',serif;
+  font-size:11px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  color:var(--red);
+  margin-bottom:28px;
+}
 
-    footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 64px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      z-index: 10;
-    }
+#toc ul{
+  list-style:none;
+  columns:2;
+  column-gap:40px;
+}
+@media(max-width:480px){#toc ul{columns:1}}
 
-    .nav-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 20px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      transition: border-color 0.2s, color 0.2s;
-      border-radius: 2px;
-    }
+#toc li{margin-bottom:10px}
 
-    .nav-btn:hover:not(:disabled) {
-      border-color: var(--red);
-      color: var(--red);
-    }
+#toc a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:14px;
+  letter-spacing:.05em;
+  transition:color .2s;
+}
+#toc a:hover{color:var(--red)}
 
-    .nav-btn:disabled {
-      opacity: 0.25;
-      cursor: default;
-    }
+/* hero */
+.hero{
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:60px 24px;
+  position:relative;
+  border-bottom:1px solid var(--border);
+}
 
-    #page-info {
-      font-size: 13px;
-      color: var(--text-muted);
-      letter-spacing: 0.1em;
-      min-width: 90px;
-      text-align: center;
-    }
+.hero-line{
+  width:1px;
+  height:80px;
+  background:linear-gradient(to bottom,transparent,var(--red));
+  margin:0 auto 48px;
+  animation:growline 1.2s ease forwards;
+}
 
-    #page-info strong {
-      color: var(--red);
-    }
+@keyframes growline{from{height:0;opacity:0}to{height:80px;opacity:1}}
 
-    #loading {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      z-index: 100;
-    }
+.hero-tag{
+  font-size:11px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:20px;
+  animation:fadein 1s .3s both;
+}
 
-    .loader-title {
-      font-size: 22px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-    }
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(38px,9vw,80px);
+  font-weight:700;
+  line-height:1.05;
+  letter-spacing:-.01em;
+  animation:fadein 1s .5s both;
+}
 
-    .loader-title span { color: var(--red); }
+.hero h1 em{
+  color:var(--red);
+  font-style:normal;
+}
 
-    .loader-bar {
-      width: 200px;
-      height: 1px;
-      background: var(--border);
-      position: relative;
-      overflow: hidden;
-    }
+.hero-author{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  font-size:18px;
+  color:var(--muted);
+  margin-top:20px;
+  animation:fadein 1s .7s both;
+}
 
-    .loader-bar::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -60%;
-      width: 60%;
-      height: 100%;
-      background: var(--red);
-      animation: slide 1.2s ease-in-out infinite;
-    }
+.hero-scroll{
+  position:absolute;
+  bottom:32px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:11px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+  animation:fadein 1s 1.2s both, bounce 2s 2s ease-in-out infinite;
+}
 
-    @keyframes slide {
-      to { left: 100%; }
-    }
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+@keyframes fadein{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-    .loader-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-      letter-spacing: 0.15em;
-      font-style: italic;
-    }
+/* content wrapper */
+.content{
+  max-width:var(--max);
+  margin:0 auto;
+  padding:0 24px;
+}
 
-    @media (max-width: 600px) {
-      .book-author, .divider { display: none; }
-      .nav-btn { padding: 10px 18px; font-size: 13px; }
-      footer { gap: 16px; }
-    }
-  </style>
+/* warning */
+.warning{
+  padding:60px 0 40px;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .8s,transform .8s;
+}
+.warning.visible{opacity:1;transform:none}
+
+.warning-inner{
+  border-left:2px solid var(--red2);
+  padding-left:20px;
+}
+.warning-label{
+  font-size:10px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--red);
+  margin-bottom:10px;
+  display:block;
+}
+.warning p{
+  font-size:15px;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+/* epigraph */
+.epigraph{
+  padding:60px 0;
+  text-align:right;
+  border-bottom:1px solid var(--border);
+  opacity:0;transform:translateY(20px);
+  transition:opacity .8s,transform .8s;
+}
+.epigraph.visible{opacity:1;transform:none}
+
+.epigraph blockquote{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  font-size:clamp(16px,3vw,20px);
+  line-height:1.6;
+  color:var(--text);
+}
+
+.epigraph cite{
+  display:block;
+  margin-top:12px;
+  font-size:13px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  font-style:normal;
+}
+
+/* poem */
+.poem{
+  padding:80px 0;
+  border-bottom:1px solid var(--border);
+  opacity:0;
+  transform:translateY(32px);
+  transition:opacity .9s ease, transform .9s ease;
+}
+.poem.visible{opacity:1;transform:none}
+
+.poem-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(13px,3vw,15px);
+  font-weight:700;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--text);
+  margin-bottom:36px;
+  display:inline-block;
+  position:relative;
+}
+
+.poem-title::after{
+  content:'';
+  position:absolute;
+  bottom:-8px;left:0;
+  height:1px;
+  width:0;
+  background:var(--red);
+  transition:width .8s .2s ease;
+}
+.poem.visible .poem-title::after{width:100%}
+
+.poem-body{
+  font-size:clamp(17px,2.5vw,19px);
+  line-height:1.95;
+  color:var(--text);
+  white-space:pre-line;
+}
+
+/* footer */
+footer{
+  padding:80px 24px;
+  text-align:center;
+  border-top:1px solid var(--border);
+}
+
+footer .f-title{
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+  margin-bottom:8px;
+}
+footer .f-title em{color:var(--red);font-style:normal}
+
+footer p{
+  font-size:13px;
+  color:var(--muted);
+  letter-spacing:.05em;
+  margin-top:6px;
+}
+
+/* back to top */
+#top-btn{
+  position:fixed;
+  bottom:28px;right:24px;
+  width:40px;height:40px;
+  border-radius:50%;
+  background:var(--red2);
+  border:1px solid var(--red);
+  color:var(--text);
+  font-size:18px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;
+  transition:opacity .3s,background .2s;
+  z-index:90;
+}
+#top-btn.show{opacity:1}
+#top-btn:hover{background:var(--red)}
+
+@media(max-width:600px){
+  .poem{padding:60px 0}
+  #toc{padding:50px 24px 40px}
+}
+</style>
 </head>
 <body>
 
-<div id="loading">
-  <div class="loader-title">Tristeza Faz <span>Parte</span></div>
-  <div class="loader-bar"></div>
-  <div class="loader-sub">Nani Ely</div>
+<div id="bar"></div>
+
+<!-- TOC drawer -->
+<div id="toc" role="dialog" aria-label="Sumário">
+  <button id="toc-close" aria-label="Fechar">✕</button>
+  <h2>Sumário</h2>
+  <ul id="toc-list"></ul>
 </div>
 
 <header>
-  <div class="title-bar">
-    <span class="book-title">Tristeza Faz <span>Parte</span></span>
-    <div class="divider"></div>
-    <span class="book-author">Nani Ely</span>
-  </div>
+  <a href="#hero" class="hlogo">Tristeza Faz <em>Parte</em></a>
+  <button id="toc-btn">Sumário</button>
 </header>
 
-<div id="viewer">
-  <div id="canvas-wrapper">
-    <canvas id="pdf-canvas"></canvas>
+<section class="hero" id="hero">
+  <div class="hero-line"></div>
+  <p class="hero-tag">Nani Ely · 2024</p>
+  <h1>Tristeza Faz<br><em>Parte</em></h1>
+  <p class="hero-author">poesia</p>
+  <span class="hero-scroll">↓ role para ler</span>
+</section>
+
+<main class="content">
+
+  <div class="warning reveal">
+    <div class="warning-inner">
+      <span class="warning-label">Nota da autora</span>
+      <p>Este livro não é recomendado para pessoas vulneráveis a conteúdos sensíveis que possam promover desconforto psicológico.</p>
+    </div>
   </div>
-</div>
+
+  <div class="epigraph reveal">
+    <blockquote>
+      "Belezas são coisas acesas por dentro.<br>
+      Tristezas são belezas apagadas pelo sofrimento."
+    </blockquote>
+    <cite>Gal Costa</cite>
+  </div>
+
+  <article class="poem reveal" id="desilusao">
+    <h2 class="poem-title">Desilusão</h2>
+    <div class="poem-body">Com o meu coração de vidro e o meu cérebro de pedra,
+Sei que vai doer
+Aquele momento que ela falar que se cansou, não quer mais saber.
+Não estou preparada para mais outra desilusão.
+Minha vida amargurada, frágil e poética gera frustração.
+Minha dor sai pelos meus olhos ao vê-la partir,
+E eu fico sozinha, refletindo.
+Pego o meu cigarro, meu copo de conhaque e vou escrever… escrever sobre ela
+Aaah ela…
+Ela que me fez sentir todos os sentimentos e sensações.
+Estou triste, mas já dizia o ditado:
+"Quem ama deixa partir".
+É… ela também partiu o meu coração,
+E deixou um vazio, apenas o vazio</div>
+  </article>
+
+  <article class="poem reveal" id="amortesalva">
+    <h2 class="poem-title">Amortesalva</h2>
+    <div class="poem-body">Eu não tenho palavras
+Que possam expressar
+Como sou feliz ao seu lado.
+Nos seus olhos que habitam a grande imensidão, o lindo horizonte, a vida e a morte, amor e ódio.
+Olhos perdidos que sabem me encontrar.
+Dono da minha inspiração.
+Dono de todas as poesias e canções.
+De todas as pessoas do mundo, eu escolhi você,
+Pois ter você diminui minha vontade de morrer.
+Mas não se engane,
+A instabilidade me cerca.
+Amortesalva.
+Amor te salva.
+A morte salva.</div>
+  </article>
+
+  <article class="poem reveal" id="parte-de-mim">
+    <h2 class="poem-title">Parte de Mim</h2>
+    <div class="poem-body">Vejo você dançando na sala
+Sorridente e iluminada
+Me abraça e dar
+Um… dois… três… suspiros
+Loucamente, me ponho no meu lugar
+E paro de delirar
+Minha preciosa, não estava mais lá
+Me lembro daquela noite de sexta-feira fria igual seu corpo e nebulosa igual seu olhar
+Ela sumiu, então rapidamente chamei a polícia, chorei e implorei que a achassem. Não poderia ficar sem ela,
+Detetives e peritos viram meu desespero, e, mesmo assim, fui a primeira a ser interrogada,
+Mas não deu nada, já era de se esperar.
+Passou dias, meses e anos. Todos os dias, eu ia lá perguntar se acharam ela, mas eles falaram que não e que iriam fechar o caso, rapidamente minha expressão de tristeza tomou o meu rosto e fui para casa,
+Quando cheguei, fui direto para a adega, peguei um bom vinho, coloquei na taça e fiz um brinde a mim mesma, por ter escondido o corpo tão bem
+Vai ser apenas minha.</div>
+  </article>
+
+  <article class="poem reveal" id="demonios">
+    <h2 class="poem-title">Demônios</h2>
+    <div class="poem-body">Demônios não morrem, não vivem
+Talvez posso chamá-los de meus,
+Meus demônios
+Rodeando a minha cama
+Cantando a mais perversa sinfonia dos infernos
+Calma e lenta
+Como uma brisa.
+Não posso dizer que estou só
+Porque onde tem tormento não há paz.
+Não posso dizer que há alguém
+Se não me chamarem de louca.
+Apenas vivo com eles
+Como diz aquele velho ditado: "tá no inferno abraça o capeta".</div>
+  </article>
+
+  <article class="poem reveal" id="nao-vou-superar">
+    <h2 class="poem-title">Não Vou Superar</h2>
+    <div class="poem-body">Minha família é podre e, inconsequentemente, sou também,
+Então cai as minhas lágrimas secas sobre todos aqueles que eu feri.
+O poeta sabe lidar mais com a dor do que com o amor,
+Pois não estamos acostumados com tal afeto.
+Me desculpa por usar esse argumento tosco, imundo.
+Não tem como voltar atrás e nem o seu perdão.
+De madrugada, olho o celular e vejo nossas fotos e conversas.
+Não consigo superar,
+Como uma vez você me disse: "não consigo esquecer esses olhos que já me olharam tão perto a ponto dos cílios se esfregarem".</div>
+  </article>
+
+  <article class="poem reveal" id="lorde">
+    <h2 class="poem-title">Lorde</h2>
+    <div class="poem-body">Sento na privada enquanto meu sangue escorre
+Infelizmente não é o sangue que você está pensando
+Rapidamente vem dezenas ou centenas de pensamentos amontoados na minha cabeça.
+Deito em posição fetal na quina direita do banheiro,
+Talvez seja fatal eu não conseguir resistir à tentação, à perturbação, à agonia que sinto
+Me sinto imunda, pior que porcos no chiqueiro
+Tomo banho e me esfolo várias vezes ao dia, querendo alívio,
+Mas infelizmente não consigo,
+Porque a sujeira está dentro de mim,
+E, mais uma vez, vou recorrer ao meu velho amigo Lorde,
+Cortante e brilhante.
+Ouço sons de anjos quando ele me toca,
+E, como se pudesse, expulsar todos meus pecados,
+Tenho alguns minutos de alegria
+Antes de eles voltarem.</div>
+  </article>
+
+  <article class="poem reveal" id="acabou">
+    <h2 class="poem-title">Acabou</h2>
+    <div class="poem-body">Começou o velho ciclo de ser quebrado igual vidro e ter que achar cada caco para se reconstruir com a esperança de voltar a ser o que era antes.
+Infelizmente, não sinto mais os calafrios,
+As borboletas na barriga,
+O brilho nos meus olhos ao ver você.
+Meu coração acelerado ao tocá-lo,
+E os arrepios que um dia você me causou.
+Já me esqueci do seu cheiro, do seu beijo,
+Do seu toque na minha pele.
+Seu sorriso não me traz felicidade,
+Eu só sinto que nossa história só me deu inspiração para poemas ruins,
+Que um dia serão lidos por pessoas amarguradas e que vão encontrar sentidos nas minhas palavras
+E sequelas que nunca vão poder se curar,
+Lembranças que nunca vão poder esquecer.</div>
+  </article>
+
+  <article class="poem reveal" id="promete">
+    <h2 class="poem-title">Promete</h2>
+    <div class="poem-body">Eu quero mais que palavras em uma mensagem de texto
+Eu quero mais
+Me ame como se eu fosse seu único e último amor
+Me faça acreditar que o amor vale a pena
+E que nossa reciprocidade é única
+Que a gente tá junto por um propósito maior
+Que você vai sempre me amar
+Prometa que não vai me deixar ir
+Me consuma antes que eu suma.</div>
+  </article>
+
+  <article class="poem reveal" id="nevoeiro">
+    <h2 class="poem-title">Nevoeiro</h2>
+    <div class="poem-body">Eu não morri, mas sinto que algo dentro de mim morreu.
+Há anos
+É normal se sentir assim?
+Um buraco vazio e escuro, mas ao mesmo tempo cheio,
+Cheio de dor angústia e agonia,
+Cheio de lembranças que se tornaram pesadelos que correm atrás de mim em uma constante perseguição sem parada sem volta e sem descanso.
+Esses olhos que já presenciaram tanta tragédia
+Acho que eu preciso de clareza,
+Bem, eu costumava dizer que ele era a luz que piscava no fundo do abismo quando parecia que não iria haver mais luz
+Mas como sou eu, toda luz vai perdendo o brilho, e se transforma em um nevoeiro denso e baldio.
+Inalei esse nevoeiro e consegui sentir todas as comoções terríveis,
+Que até anjos e demônios abominavam,
+Parecia que eu tinha aberto a caixinha de Pandora e atraído todas as maldições para mim,
+Acho melhor eu cavar nossas covas,
+Me dê suas mãos e se afunde mais comigo...</div>
+  </article>
+
+  <article class="poem reveal" id="po">
+    <h2 class="poem-title">Pó</h2>
+    <div class="poem-body">As rosas que você me deu viraram pó
+Assim como nós.
+Felizmente, não caio mais em um ciclo de cair em um oceano de pranto,
+Não me afogo mais no meu sangue,
+Te enterrei em um túmulo embaixo da minha janela
+Para olhar e me lembrar de tudo,
+De todas as merdas
+Flores mortas no meu jardim, alimentadas com o suco do seu corpo.</div>
+  </article>
+
+  <article class="poem reveal" id="autocontrole">
+    <h2 class="poem-title">Autocontrole</h2>
+    <div class="poem-body">Que a minha tristeza seja autossuficiente,
+Autossuficiente o bastante para preencher o vazio e me deixar completa.
+Que eu saiba lidar com a solidão,
+Que a dor que eu sinto se transforme em
+Poesia.
+Que o ódio que habita em mim se torne benevolência.
+Que eu tenha controle sob meus demônios,
+Que eles se tornem parte de mim,
+Não eu deles.</div>
+  </article>
+
+  <article class="poem reveal" id="cristal">
+    <h2 class="poem-title">Cristal</h2>
+    <div class="poem-body">Você disse que meu coração é uma pedra e, por mais que você tentasse lapidar, você nunca conseguia e estava cogitando em desistir.
+Não quebre meu coração, por favor,
+Por dentro ele é cristal e, como todo cristal, precisa de muito esforço para lapidar e transformar.
+Eu realmente não sei se meu cristal é tóxico igual a morganita frágil, igual a cianita negra ou forte igual o quartzo.
+Então esteja preparado,
+Por mais tóxica frágil ou forte que seja.</div>
+  </article>
+
+  <article class="poem reveal" id="nuvem">
+    <h2 class="poem-title">Nuvem</h2>
+    <div class="poem-body">Ela tinha o semblante tão firme,
+Firme como quartzo,
+Tóxico como morganita,
+E um aspecto frágil como cianita negra.
+Posso compará-la com as flores
+Mesmo mortas, murchas e com as pétalas caindo,
+Mesmo no lixo tóxico da vida,
+Elas renascem.
+Ela tenta se renovar todos os dias.
+Olha, posso compará-la com nuvens também,
+Que mudam de segundo em segundo e, às vezes, não existem mais,
+Ou tentam não existir…
+É um conflito interno desde o dia que recebeu o sopro da vida,
+Ela sempre se machuca
+E lá vai ela fingir ser sado novamente.
+Posso compará-la com mil e uma coisas,
+Mas nenhuma vai ser suficiente e definitiva.
+Ela é um ciclo
+Ou ela tenta ser um…</div>
+  </article>
+
+  <article class="poem reveal" id="fases-1">
+    <h2 class="poem-title">Fases</h2>
+    <div class="poem-body">Eu tenho lá minhas fases
+Fases de dor:
+Número um, dor com negação,
+Número dois, dor com choro,
+Número três, dor com raiva,
+Número quatro, dor com desprezo,
+Nessa mesma ordem.
+Na primeira fase, eu me pergunto o porquê,
+Tenho uma chuva de pensamentos e nenhum parece ser o suficiente para ser a resposta.
+Na segunda, eu começo a me desesperar,
+Está tudo desmoronando, e eu não consigo consertar.
+A terceira fase é uma das mais dolorosas, eu me faço de abismo e machuco tudo e todos que ousarem passar na minha frente.
+A quarta fase é a última, mas não a menos importante,
+Nessa fase eu me calo
+E rapidamente vem a ideia de
+"tanto faz", "não ligo", "acabou"
+E eu tento fazer essa a minha verdade,
+Mesmo não sendo.</div>
+  </article>
+
+  <article class="poem reveal" id="poeira">
+    <h2 class="poem-title">Poeira</h2>
+    <div class="poem-body">Abro minha gaveta e me deparo com uma caixa
+Trancada, velha e empoeirada.
+Lá parece ter tudo
+E ao mesmo tempo não ter nada.
+Bem, ela tá cheia,
+Cheia de amor,
+Um amor que não existe mais.
+Lembranças eternizadas em uma pequena caixa,
+Lembranças que aos poucos estou me esquecendo.
+Tem alguns corações de tecido vermelho,
+Eram radiantes na época,
+Hoje em dia estão desbotados.
+Com uma cor acinzentada,
+Tem várias cartas que refletem o drama e o fogo da paixão adolescente,
+Cartas que também perderam o valor
+Com algumas manchas amareladas,
+Buracos feitos por traças,
+Enfim, só restaram palavras.</div>
+  </article>
+
+  <article class="poem reveal" id="desconexao">
+    <h2 class="poem-title">Desconexão</h2>
+    <div class="poem-body">Já são 3h da madrugada
+E infelizmente ainda não dormi,
+Mas tá tudo bem,
+Daqui a pouco meu remédio faz efeito.
+Eu tenho que acordar cedo,
+Ultimamente os dias estão passando devagar,
+Parecem triplicar as horas,
+Mas as noites passam tão rápido.
+Fico imaginando coisas inimagináveis
+E às vezes me perco nessa loucura.
+Parece que meu coração vai explodir,
+Mas eu não entendo.
+Eu nem estou sentindo o meu corpo,
+Não tenho conexão,
+Minha alma, corpo e mente estão separadas.
+Não sei quais são as emoções,
+Parece que não estou sentindo nada,
+Só parece.
+Eu acho que meu corpo e mente chegaram a uma conclusão:
+Eles desistiram, apenas desistiram.
+Eu acho que a alma tem algum resquício de esperança,
+O suficiente para não desistir, talvez.</div>
+  </article>
+
+  <article class="poem reveal" id="por-que">
+    <h2 class="poem-title">Por Quê?</h2>
+    <div class="poem-body">Eu não sou preenchível
+Procuro algo, mas não acho
+Parece que tudo escorre.
+Sou uma jarra rachada,
+Tudo que entra sai.
+Nem que seja aos poucos,
+Uma fonte que só tem continuidade com impulso de algo.
+Eu não entendo o porquê não me sinto completa,
+Nem por que precisar de algo ou alguém para dar sentido à minha vida.
+Cicatrizes não cicatrizam,
+Mais uma mentira desmentida.
+Gatilhos fazem inflamar,
+E como não inflamar?
+Se não tem como evitar?</div>
+  </article>
+
+  <article class="poem reveal" id="canto-da-cama">
+    <h2 class="poem-title">Canto da Cama</h2>
+    <div class="poem-body">Eu vejo que estou no ápice da tristeza quando escrevo poesias,
+No canto da cama eu me deito,
+E a parede gelada me abraça.
+Eu enxergo a imensidão do colchão e dos lençóis
+E me sinto tão pequena e só.
+Me abraço em desespero,
+Ainda não sou imune às chamas do inferno.
+Mesmo passando por elas incontáveis vezes,
+Parece que estou ficando mais fraca.
+As posições na cama estão cada vez mais desconfortáveis.
+Dizem que os olhos são o portal para a alma, e mesmo assim me olho no espelho e fico hipnotizada
+Com o extremo vazio que me encontro.</div>
+  </article>
+
+  <article class="poem reveal" id="conforto">
+    <h2 class="poem-title">Conforto</h2>
+    <div class="poem-body">Me deparo perdida em seus olhos, querendo respostas.
+Mergulhei nesse poço fundo de águas rasas,
+Te fiz de oxigênio,
+O mesmo que me dar impulso para viver está me matando.
+Por favor, me abrace quando a temperatura do meu corpo cair
+E a morte tentar me chamar
+Ou eu tentar chamá-la.
+Mesmo que os braços dela sejam quentes e reconfortantes,
+Eu prefiro os seus,
+Seja meu universo e me tire do buraco negro.</div>
+  </article>
+
+  <article class="poem reveal" id="poco">
+    <h2 class="poem-title">Poço</h2>
+    <div class="poem-body">Odeio olhar em seus olhos e enxergar outra pessoa
+Se você beijar meu rosto, vai sentir o gosto salgado das minhas lágrimas.
+Por favor, olhe para mim e ignore os cortes,
+O sangue que corre não me pertence mais,
+Não escorre pelos meus braços,
+Para eu saber se você realmente me ama,
+Você precisa ir ao inferno três vezes comigo e voltar sendo você.
+Por mais que eu tente pressionar meus ouvidos com esperanças que parem,
+Eles não param,
+E repetem as mesmas coisas.
+Me perdoe!
+Como você disse, sou um poço de traumas,
+Pessoas feridas ferem outras pessoas.
+Eu sei que está tentando me esquentar, mas nem faz diferença nesse frio,
+Talvez eu tenha me tornado o próprio dedo gelado da morte.</div>
+  </article>
+
+  <article class="poem reveal" id="va">
+    <h2 class="poem-title">Vá</h2>
+    <div class="poem-body">Eu te traí
+Com as minhas próprias lágrimas.
+Elas saem em uma quantidade absurda,
+Quando chegam na minha boca, parece um beijo molhado, quente e salgado com gosto de mar.
+Quando me desligo minhas mãos, já estão sangrando e vejo você novamente com sua blusa tentando limpar.
+Não queria que você tivesse que manchar sua blusa.
+Me desculpa, mas eu sinto que vou explodir!
+Por favor, vá, mas não me deixe sozinha.
+Se quiser, pode ficar
+Me trate igual vidro
+Se me quebrar,
+Band-aid® não resolverá.
+Me segure forte,
+Mas não tão forte
+Somos uma rosa.</div>
+  </article>
+
+  <article class="poem reveal" id="posse">
+    <h2 class="poem-title">Posse</h2>
+    <div class="poem-body">Lágrimas descem sempre nos mesmos lugares e cortam igual navalha
+E está abrindo um abismo tão fundo e escuro
+E tem algumas coisas vagas que eu não me lembro bem,
+Mas são estilhaços de memórias e sentimentos.
+Me afundei na falésia e me vejo pequena diante de tudo
+Meu consciente afastando o inconsciente com correntes e cadeados
+Meu id passando por cima de todos, inclusive de mim, e pondo em pauta todo ego e arrogância,
+Transformando toda racionalidade em pó.
+Uma disputa para ver quem vai me matar primeiro,
+Quem tomará posse de mim.</div>
+  </article>
+
+  <article class="poem reveal" id="beijo">
+    <h2 class="poem-title">Beijo</h2>
+    <div class="poem-body">Seus beijos tinham gosto de poesia e a todo momento queria escrever
+Algumas páginas vazias
+E uma garrafa da sua pior bebida.
+Em alguns instantes, começo uma cerimônia,
+Podemos chamar de nosso pacto,
+Te faço de bebida para matar a minha sede.
+Não me faça de bússola,
+Mas venha até mim e não pare de olhar para o norte dos meus olhos.
+Eles são vazios como a garrafa do alcoólatra,
+Mas se você tiver sorte pode, encontrar alguns fragmentos de mim.
+Vou sempre tentar te alertar,
+Me amar talvez não seja a melhor opção,
+Talvez eu seja seus olhos quando tudo está escuro e não parece ter mais luz,
+Ou o próprio Satã que decreta:
+"Tudo que era luz se transformou em escuridão".</div>
+  </article>
+
+  <article class="poem reveal" id="umbral">
+    <h2 class="poem-title">Umbral</h2>
+    <div class="poem-body">Quando minha mente me domina, entro no umbral entre vida e morte
+Me vejo na cama prestes a ter um desencarne
+Ou pode ser apenas uma contração.
+Mente que mente para mim,
+Queria que você me deixasse ir
+Eu não sei se o mundo é de mais para mim
+Ou se eu sou demais para o mundo,
+Eu só não sei qual mundo se é o que você vive ou o que eu vivo.
+Não consigo me manter intacta por muito tempo,
+Aos poucos vou me perdendo,
+Minha alma saindo lentamente do meu corpo enquanto você grita socorro.</div>
+  </article>
+
+  <article class="poem reveal" id="paralisia">
+    <h2 class="poem-title">Paralisia</h2>
+    <div class="poem-body">Você me conhece,
+Me leia com suas palavras,
+Me interprete como se eu fosse um momento ruim que você esteja passando,
+Me chame de banho,
+Me coloque na sua banheira e me deixe te afogar com as minhas palavras,
+Palavras entaladas na sua garganta enquanto você tenta gritar
+Me chamando de paralisia do sono,
+Fingindo que eu não sou você,
+Com os pés presos e a língua enrolada,
+Sofrendo uma petrificação cadavérica,
+Assistindo e sentindo tudo.
+Olhe para cima, esse é o seu reflexo,
+Essa é sua parte angelicalmente demoníaca,
+Que vai tentar te destruir até conseguir.</div>
+  </article>
+
+  <article class="poem reveal" id="submissao">
+    <h2 class="poem-title">Submissão</h2>
+    <div class="poem-body">Vou te chamar de fogo para me iluminar,
+Esquente os meus pés e mãos
+Até chegar no coração.
+Mesmo me queimando não consigo te soltar,
+Está fazendo bolhas e o cheiro não é agradável,
+Mas eu não ligo.
+Só quero ficar com você,
+Pode me machucar,
+Pois nada que você fizer vai ser desesperador o bastante como sua ausência.
+Deito em seus braços,
+Deixo você me sugar.
+Me chame,
+Sei que você não me ama,
+Não importa,
+Cubro sua parte.
+Vou fingir que sou sadomasoquista,
+Vou fazer dar certo,
+Ando sobre cacos de vidro,
+Na areia quente do deserto.</div>
+  </article>
+
+  <article class="poem reveal" id="suicidio">
+    <h2 class="poem-title">Suicídio</h2>
+    <div class="poem-body">Eu fiz um acordo com diabo,
+Jantar em uma mesa vazia nunca foi tão solitário.
+A última vez que eu pensei em concretizar isso,
+Eu preparei tudo,
+Eu não lembro o que me fez desistir nem o porquê,
+Já tinha me matado várias vezes de uma forma muito mais dolorosa para não ferir os que me amam,
+Mas dessa vez foi diferente.</div>
+  </article>
+
+  <article class="poem reveal" id="dependencia-emocional">
+    <h2 class="poem-title">Dependência Emocional</h2>
+    <div class="poem-body">Eu sinto uma mistura de medo e ódio.
+Quando eu estou com você, é como se eu tivesse anestesiada da vida, mas quando você vai embora, os pesos e as correntes voltam.
+Pensei muito em ir, mas eu queria ver o seu rostinho pela manhã.
+Eu tenho medo do iniciar e do terminar.
+Odeio o processo,
+A incerteza me corrói, a dor do não saber é inexplicável.
+Eu me apego rápido e com intensidade,
+Mudanças não fazem parte,
+Te perder é me perder.
+Se você chegou aqui já sabe:
+Você é meu banquinho,
+E eu sinto a corda apertando meu o pescoço
+A cada passo que você dá.</div>
+  </article>
+
+  <article class="poem reveal" id="tudo-igual">
+    <h2 class="poem-title">Tudo Igual</h2>
+    <div class="poem-body">Tá tudo igual,
+Sempre as mesmas respostas,
+Os mesmos olhos.
+Sinto que o mundo precisa acabar,
+O meu mundo, o seu mundo, o nosso mundo,
+Tenho impressão de que seria melhor.
+Dói saber que tenho que viver miseravelmente em busca de um propósito,
+Eu não quero ser o propósito.
+Os grilhões dificultam os meus passos,
+E essa sede louca de paz me deixa instável
+E, para mim, só tem um caminho definitivo onde posso a encontrar,
+Ela sempre me chama e eu sei que te chama também.</div>
+  </article>
+
+  <article class="poem reveal" id="equilibrio">
+    <h2 class="poem-title">Equilíbrio</h2>
+    <div class="poem-body">Grita nua, que eu vou materializar todo nosso ódio em um papel.
+Vamos fazer nosso antigo testamento,
+Queimar todos os nossos pecados,
+Vamos ser a força maior.
+Não terá labirintos,
+Não terá corda bamba nem vendas,
+Não terá os gritos de discórdia,
+Não terá o limbo.
+Vai ser apenas nós
+Em um lugar limpo, claro,
+Vamos andar sobre a grama verde,
+Vamos cantar enquanto os anjos manuseiam a orquestra,
+Vamos ser a fauna e flora, manter o equilíbrio,
+Nosso equilíbrio,
+Corpo e alma.</div>
+  </article>
+
+  <article class="poem reveal" id="mar">
+    <h2 class="poem-title">Mar</h2>
+    <div class="poem-body">Mãe, eu tenho medo do mar.
+Tá escuro e muito turbulento, eu não quero me afogar,
+O céu está caindo,
+As gotas caindo na minha testa virarão tortura.
+Não tenho onde me segurar,
+Nem me esconder.
+Não sei se consigo ficar firme por mais tempo.
+Eu tô com muito medo!
+O céu não me dá sensação de paz,
+Muito menos o chão que piso.
+É imprevisível.
+Eu não sei quando vai acontecer e o que vai acontecer,
+Ter certeza da incerteza,
+Não ter peso ou pesar,
+Queria voltar para seu colo de ouro.</div>
+  </article>
+
+  <article class="poem reveal" id="viagem">
+    <h2 class="poem-title">Viagem</h2>
+    <div class="poem-body">Viajo anos luz daqui...
+O anel que eu te dei vai ser esquecido, encontrado e derretido,
+Nossa casa não vai ser nossa,
+Todas as cartas vão virar pó,
+Os quadros que pintamos, as poesias que eu fiz, podem adquirir algum valor,
+Pois arte só tem valor se quem deu a vida a ela estiver morto,
+Ou posso ser violada e apagarem o meu nome da única coisa que poderia me fazer eterna.
+Nossas roupas vão parar em algum bazar
+E ninguém vai sentir o peso da história delas.
+Vão construir e destruir memórias,
+Ninguém vai lembrar de nós,
+Nossas conquistas, de certa forma, são inúteis se for para pensar em longo prazo.
+Não consigo aceitar que vai acabar!
+Por mais que demore,
+Vamos ser regados no jardim por novos seres.</div>
+  </article>
+
+  <article class="poem reveal" id="arte">
+    <h2 class="poem-title">Arte</h2>
+    <div class="poem-body">Artistas são terrivelmente assombrados,
+Toda arte é derivada do pior para te encantar ou aterrorizar,
+Concretizada, muitas vezes, em museus e bibliotecas.
+Angústia que não passa,
+Um clichê de palhaço triste,
+Irritante jeito de questionar,
+Eu não quero fazer você sorrir,
+Apenas pensar, então pensa comigo!
+Irei compartilhar cada detalhe do insano sigilo que habita em nossa cabeça,
+Uma caixinha de surpresas,
+Ou poderíamos chamar de jogos mortais.
+Se seu quarto estiver escuro, olhe embaixo da cama,
+Vai ver sua própria alma pobre e miserável.
+Deem as mãos e comecem a se rastejar,
+À sua direita tem a esperança que você não cultiva e está quase morrendo;
+À sua esquerda você sabe o que tem.</div>
+  </article>
+
+  <article class="poem reveal" id="voce-sabe-quem">
+    <h2 class="poem-title">Você Sabe Quem</h2>
+    <div class="poem-body">Me diz mesmo se valeu a pena.
+Por que você me deixa assim?
+Por que eu não consigo te odiar do mesmo jeito que eu me odeio?
+Eu não consigo te perdoar do mesmo jeito que eu não consigo te deixar.
+Você vai embora e me deixa sozinha,
+Quando eu acho que me recuperei e esqueço que você existe,
+Você aparece e me arrasta para o mesmo lugar onde você me deixou,
+Você me usa e abusa porque sabe que eu me sinto tão insegura que a qualquer momento vai poder me invadir.
+Me enche de esperanças com os seus planos e depois suga toda ela de mim.
+Dói saber que você é um teatro ambulante e que interpreta todos os personagens
+Como disse o Baco Exu do Blues:
+"Amor você é como o sol, ilumina o meu dia, mas queima a minha pele".</div>
+  </article>
+
+  <article class="poem reveal" id="caixa">
+    <h2 class="poem-title">Caixa</h2>
+    <div class="poem-body">Aqui é sujo e bagunçado,
+Por mais que eu tente, não consigo organizar.
+Tento pedir ajuda, mas meu corpo não reage.
+Não tenho forças para gritar nem levantar,
+Faço pequenos laguinhos no travesseiro antes que o tecido absorva.
+É difícil sair daqui,
+Queria falar o que eu penso, em vez de "eu sou feliz sendo triste, me deixa sozinha".
+A impulsividade e a neurose brincam de roda ao meu redor,
+E aos poucos o meu quarto vai virando uma caixa.
+Faço qualquer barbaridade por um segundo de serotonina
+E no momento não existe consequência nem medo.</div>
+  </article>
+
+  <article class="poem reveal" id="ponto-e-virgula">
+    <h2 class="poem-title">Ponto e Vírgula</h2>
+    <div class="poem-body">Essa pode ser minha última poesia,
+Não irei prometer mais. Sou uma bomba relógio. Se você está lendo, é porque uma parte de mim que não pode ser tocada muito menos fotografada
+Foi materializada, e chegou até você de alguma forma.
+Começou estranho, porém não irei morrer. Quem faz arte não morre, ressuscita, mas não se engane, só ressuscita depois que morre.</div>
+  </article>
+
+  <article class="poem reveal" id="torta-de-morango">
+    <h2 class="poem-title">Torta de Morango</h2>
+    <div class="poem-body">Amo nossas noites de torta de morango, nossas tardes de chás e as noites quentes de inverno quando saímos para tomar sorvete.
+Pega na minha mão e fala que ninguém nunca vai nos pegar.
+Amo quando saímos, porém vamos embora cedo, porque o karaokê que fazemos é mais excitante.
+Te falo para pegar o violão e o microfone,
+Sem perceber viramos uma música da Rita Lee,
+O real símbolo do infinito.
+Gritamos de tanto imaginarmos loucuras,
+Vamos para o parque deitar na grama e olhar para o céu,
+Sempre julgando as formas das nuvens
+E como elas se transformam e formam.
+Com você, filme de terror vira comédia e nós somos o júri exigente.</div>
+  </article>
+
+  <article class="poem reveal" id="perdida">
+    <h2 class="poem-title">Perdida</h2>
+    <div class="poem-body">Perdida entre amores e obsessões,
+Se as pessoas soubessem...
+Com outras pessoas, me sinto tão grande;
+Com você, tão pequena.
+Mentir, falar de amor olhando nos olhos é fácil,
+Com você, eu travo.
+Eu entendo agora que amor maltrata,
+Que com qualquer pessoa consigo ser descarada.
+A sua sensibilidade me sensibiliza,
+Meu jeito rude me faz ser forte, menos quando estou com você,
+Caio em seus braços, deito nos seu colo,
+Me deixe falar: me ajude a cortar as raízes podres.</div>
+  </article>
+
+  <article class="poem reveal" id="balao">
+    <h2 class="poem-title">Balão</h2>
+    <div class="poem-body">Me sinto leve como um balão,
+Película fina cheia de ar.
+Sinto que se um leve vento bater, ele me leva.
+Levanto para sair do meu quarto,
+Pego a maçaneta e, com toque leve, giro rápido.
+Tá tudo escuro, minha mente convulsiva,
+Quando vejo, estou de bruços novamente em cima da cama.
+Não entendo por que está crescendo muros na minha porta e na janela.
+Não, acho que entendi:
+Tenho que desistir de tentar seguir a luz,
+Aqui é mais quente e confortável,
+Nenhum vento vai me levar,
+Nenhum espinho vai me machucar.</div>
+  </article>
+
+  <article class="poem reveal" id="limonada">
+    <h2 class="poem-title">Limonada</h2>
+    <div class="poem-body">Não tenha medo de se encontrar em mim,
+Antes de nos encontrarmos não éramos ninguém.
+Meus versos refletem a vida de uma forma sombria, porém linda,
+E a maioria deles não refletem vocês.
+Não se machuque, esse fardo você não tem que carregar,
+Infelizmente ou felizmente toda arte é derivada de dor e sofrimento,
+É assim que fazemos a limonada com os limões que a vida nos dá.
+Vamos aprender a dançar no nosso ritmo,
+Se você quiser, a gente se encaixa.</div>
+  </article>
+
+  <article class="poem reveal" id="decisao">
+    <h2 class="poem-title">Decisão</h2>
+    <div class="poem-body">Todos os dias, nós temos que tomar uma grande decisão quando abrimos os olhos,
+Mas é muita tentação.
+Garrafa quebrada no canto da cozinha,
+Lâmina de barbear jogada no banheiro,
+Corda de pular da nossa filha...
+Eu acordo com gritos gritando o meu nome,
+A taquicardia começa e com ela a sensação que o meu tórax vai ser estilhaçado
+Por que eu tô gritando comigo?
+Eu tô ouvindo!
+Essa voz irritante é minha ou é a oficina do diabo funcionando?
+Mas minha mente nunca está vazia, principalmente quando estou sozinha.</div>
+  </article>
+
+  <article class="poem reveal" id="notas">
+    <h2 class="poem-title">Notas</h2>
+    <div class="poem-body">Minhas notas te notam
+Minhas notas te veem
+Minhas notas te sentem
+Minhas notas te tocam
+Minhas notas te querem
+Minhas notas te amam
+Minhas notas te odeiam
+Minhas notas te falam a verdade
+Minhas notas te inventam mentiras
+Minhas notas te abrem
+Minhas notas te fecham
+Minhas notas te fazem sorrir
+Minhas notas te fazem chorar
+Minhas notas te chamam
+Minhas notas te encontram
+Minhas notas te perdem
+Minhas notas te levam para os céus
+Minhas notas te levam para o inferno
+Minhas notas te atormentam</div>
+  </article>
+
+  <article class="poem reveal" id="flores">
+    <h2 class="poem-title">Flores</h2>
+    <div class="poem-body">Tulipas da cor da cor
+Hoje eu vi uma tulipa, achei linda.
+Na verdade, não me dê flores,
+Mas se encontrar uma flor ou folha dentro de algum livro, lembre-se de mim.
+Escreva nas folhas e cheire as flores,
+Tem um aroma inigualável,
+Principalmente, as rosas que eu acho sem graça.
+Beijos e beijos de batom.
+Se encontrar um beijo no livro, lembre-se de mim,
+É sinal que foi tão marcante que resolvi marcar com um beijo de batom.
+Se encontrar marcas de dedos no livro, lembre-se de mim.
+Infelizmente, eu estava comendo um salgadinho,
+Não foi por querer, e eu fico sentida quando isso acontece.
+Mas não tem como limpar minhas digitais sem fazer mais bagunça.</div>
+  </article>
+
+  <article class="poem reveal" id="todos-os-abusos">
+    <h2 class="poem-title">Todos os Abusos</h2>
+    <div class="poem-body">Me liberta conseguir desabafar de forma genuína e poética sobre meus abusos, seus abusos, nossos abusos. Mas a minha cabeça dá um branco e o que resta é medo e nojo.
+Mas não deveria ser assim, né?
+Eu tenho bloqueios que me impedem de viver.
+Eu sei que não é culpa minha, mas eu sinto,
+Eu sinto tudo, tudo de novo e de novo.
+Como uma criança pode chamar atenção de uma forma imprópria? São as roupas? A forma de falar ou expressar?
+Me falaram que homens são assim mesmo
+E eu acreditei e me senti mais podre.
+Arrastei os meus joelhos no chão pedindo perdão.
+O abuso psicológico começou dentro de casa e na igreja.
+E isso te toca e incomoda por mais que sejam apenas palavras, elas impõem e te opõem.
+A igreja é a casa de Deus, mas as ovelhas estão mais para lobos, famintos.
+Pobre criança, começou a se machucar.
+Cada gota de sangue que escorreria era esperança de ficar mais limpa, como um sacrifício.</div>
+  </article>
+
+  <article class="poem reveal" id="circo">
+    <h2 class="poem-title">Circo</h2>
+    <div class="poem-body">Vamos desbravar todo o circo
+Colocamos nossos pecados e sapatos de palhaço, o nariz vermelho e a maquiagem feliz.
+Começamos com a corda bamba, é fundamental saber se equilibrar.
+Se cair, não vai ter quem te segurar.
+Depois vamos domar nossos animais internos,
+Agora vamos colocar pernas-de-pau para tentar ver mais do que conseguimos.
+Vamos fazer mímicas para tentar fazer alguém nos entender,
+Vamos usar o ilusionismo para tentar escapar,
+Agora vem o mais esperado: o show de aberrações em que você apresenta o que te compõe temor, nojo, vergonha, inveja e desprezo.</div>
+  </article>
+
+  <article class="poem reveal" id="amar">
+    <h2 class="poem-title">Amar</h2>
+    <div class="poem-body">Amor? O que é amor? Amar algo?
+Amor próprio? Se amar? Amar alguém?
+Te amar? Amar? Eu amo?
+Amor machuca, então por que amar?
+Se não dói não é amor, mas por quê?
+Para adquirir amor tem que conquistar, e
+O processo dói.
+Se não é amor, então por que eu consigo falar e me expressar de forma fácil e imprudente?
+Você não ama apenas, está brincando de amar.
+Não é fácil ser descarado quando ama,
+Há vergonha e as mariposas na barriga,
+Você treme por dentro e por fora.
+Se não há sofrimento, não existe amor.</div>
+  </article>
+
+  <article class="poem reveal" id="voce">
+    <h2 class="poem-title">Você</h2>
+    <div class="poem-body">Tenho sensação que o espelho grita:
+"Você não me ver,
+Você não me ouve,
+Você não me sente,
+Você não me procura,
+Você não me responde,
+Você não me liga,
+Você não me conhece,
+Você não me merece,
+Você não cultiva,
+Você não me ama,
+Você não se importa,
+Você não se preocupa,
+Você não se lembra,
+Você não se interessa,
+Você se ausenta."</div>
+  </article>
+
+  <article class="poem reveal" id="identidade">
+    <h2 class="poem-title">Identidade</h2>
+    <div class="poem-body">Buscar aprovação
+Crise de identidade
+Participar de bolhas
+Bolhas de sabão
+Não ser você
+Mas nem você sabe o que é
+Quem é ou com quem anda
+Somos como gelo, inconstante
+Dureza e confiança é película
+Quando as coisas começam a esquentar, derretemos e viramos vapor
+Não temos identidade
+Somos vírus, contaminado cada lugar
+Andamos em busca de informações e inovações
+Qualquer porcaria que libere pelo menos cinco segundos de dopamina
+Achar sentido cada vez que o que temos desgasta
+É uma corrida, precisar de propósito.</div>
+  </article>
+
+  <article class="poem reveal" id="hipocrita">
+    <h2 class="poem-title">Hipócrita</h2>
+    <div class="poem-body">Sororidade e aceitação,
+Acho triste como só pode existir na Internet.
+Engraçado a hipocrisia de quem questiona, tipo eu,
+Mas a mudança tem que começar de algum lugar, não importa onde.
+É difícil aceitar e mudar quando não te acrescenta,
+Temos inúmeros exemplos ao decorrer da história,
+O impacto que a leitura tem é evidente,
+Um dos pilares para a sociedade chegar até aqui.
+Se você não gosta ou acha desnecessário, é porque você não se identifica.
+Somos egoístas, ignorantes e hipócritas.
+Não temos que normalizar isso.</div>
+  </article>
+
+  <article class="poem reveal" id="liberdade">
+    <h2 class="poem-title">Liberdade</h2>
+    <div class="poem-body">Queria te lembrar que eu perdi o medo do escuro,
+Não existe mais o temor de fechar os olhos, nem quando ando pelos corredores.
+Ninguém me observa, eu que os observo.
+Tentam sussurrar no meu ouvido enquanto ouço seus passos,
+Eu sou maior, vou lutar contra
+A maioria das vezes não vai ser sozinha, pois recusar ajuda é a arma dos tolos.
+Escolher céu ou inferno é fácil,
+Lidar com a consequência de se manter que não.</div>
+  </article>
+
+  <article class="poem reveal" id="conservador">
+    <h2 class="poem-title">Conservador</h2>
+    <div class="poem-body">Tento me descarregar em palavras e ruídos,
+Mas os cadeados e as correntes sempre voltam.
+Me moldar à sua imagem enquanto viola o meu corpo,
+Me tortura, me arrasta e me afasta.
+Eu sou culpada por ser quem eu sou?
+Me condena como se fosse Deus,
+Pregando sua vida de mentiras
+Me chama de imunda e me afoga nas suas águas,
+Que Deus é esse que você prega?
+Deus do ódio e do rancor, que apedreja e rejeita?</div>
+  </article>
+
+  <article class="poem reveal" id="valores">
+    <h2 class="poem-title">Valores</h2>
+    <div class="poem-body">Somos como urubus,
+Carniceiros, esperando a morte do próximo.
+Nos alimentamos todos os dias de cada fruto que essa terra regada de sangue nos dá,
+Menosprezando os valores,
+Fazendo crescer o peso nos seus ombros.
+Não julgue o meu olhar crítico
+E não tente desver o lado cinza da vida.
+Eu sei que você tá tentando ser algo, mas seus pés estão afundando no asfalto,
+Cada vez que você tenta dar um passo, afunda mais.</div>
+  </article>
+
+  <article class="poem reveal" id="seres-organicos">
+    <h2 class="poem-title">Seres Orgânicos</h2>
+    <div class="poem-body">Por mais que eu não queira ser um momento em sua vida, eu sei que sou que eu posso ir e não voltar.
+Isso serve para todos nós. É engraçado pensar em como somos patéticos, e colocamos pedras no caminho, sempre parece algo gigantesco, mas é o momento.
+Sempre é um momento, as coisas mudam,
+Pessoas mudam, e se resolvem.
+Não precisa viver no limite, o mundo não vai acabar, você dizer "não" não é o fim do mundo. Pessoas passam e repassam, tudo vira história e conhecimento. Aprenda a usar em prol de você, sempre há uma opção, por mais que não seja clara.</div>
+  </article>
+
+  <article class="poem reveal" id="feliz">
+    <h2 class="poem-title">Feliz</h2>
+    <div class="poem-body">Não se permitir ser feliz é constante,
+Me sentir feliz e não conseguir verbalizar também.
+Sempre diminuindo, falando: "estou animada, eufórica", mas nunca feliz.
+Realmente, felicidade é escassa, e não saber o que é ou como sentir me deixa assim
+Acostumada com apatia e desgraça, isso desgasta. Sinto e não sei aproveitar, mesmo que não seja com tanta frequência.</div>
+  </article>
+
+  <article class="poem reveal" id="tres">
+    <h2 class="poem-title">Três</h2>
+    <div class="poem-body">Eu nunca fui a amiga do meio,
+Nunca fui a disputada do trio,
+No trio, sempre tem número um, ela é a do meio, tentamos ser iguais a ela e passar mais tempo juntas.
+A número dois fica à direita, tem estabilidade que se o trio acabar continuará com a número um.
+Por último, a número três, sempre fica do lado esquerdo, tentando se validar e tem medo de ficar sozinha, sempre aceita coisas horríveis para continuar onde está.
+Já passei em tantos trios, nunca fui a um e nunca serei, não por falta de esforço.
+Normalmente, a número três só está ali para cobrir uma vaga, vaga.</div>
+  </article>
+
+  <article class="poem reveal" id="renascimento">
+    <h2 class="poem-title">Renascimento</h2>
+    <div class="poem-body">Idealizo o meu túmulo e não faço ideia do que está escrito na lápide,
+Vou rabiscar e escrever até virar pó e, com as minhas lágrimas, virar argila para me remoldar, como se eu fosse Deus e fizesse a Lilith e apagasse a falha existência dela com a Eva, com esperanças de melhora e submissão.
+Porém sabendo o que vai acontecer e como vai se repetir, e como vai ser doloroso, e como vai gerar consequências irreversíveis.
+E assim volto para o começo.</div>
+  </article>
+
+  <article class="poem reveal" id="abstrato">
+    <h2 class="poem-title">Abstrato</h2>
+    <div class="poem-body">Isso tudo é uma forma abstrata de se expressar.
+Muitas vezes, incompreendida e solo.
+Se você for atencioso, vai perceber veias e sangue correndo entre as palavras.
+Se você tocar, irá sentir os batimentos e talvez o aconchego quentinho.
+Somos um quebra-cabeça, sempre encontrando peças e perdendo outras, há algumas que, quando encontramos, ficamos perplexos com tamanha preciosidade e esquecimento.</div>
+  </article>
+
+  <article class="poem reveal" id="armadura">
+    <h2 class="poem-title">Armadura</h2>
+    <div class="poem-body">Me diz quantas versões você tem?
+É tão simples mudar por um momento.
+Abra o seu guarda-roupa e vê se hoje vai ser a protagonista ou a figurante,
+Todas as suas peles estão penduradas.
+Olhe o semblante de cada uma e tente escolher a certa, mas sem chorar, você não tem esse açougue por acaso,
+Você conquistou tantas peles que não se lembra mais da verdadeira.</div>
+  </article>
+
+  <article class="poem reveal" id="proximo">
+    <h2 class="poem-title">Próximo</h2>
+    <div class="poem-body">Me sinto usada todas as vezes que você me chama para ajudar a enterrar o estrago que você faz.
+Você me usa para tentar se sentir melhor, cada vez que você destrói outra pessoa.
+Você sabe, parece que eu sou o seu refil sem fim
+E eu não consigo sair, todos os dias me vejo, enquanto você joga terra lentamente.
+Isso está mais próximo do que eu possa pensar, e eu espero que esteja mesmo.
+Os meus dedos estão sangrando de tanto cavar, e cavo o mais fundo possível para você me enterrar.</div>
+  </article>
+
+  <article class="poem reveal" id="pretinha">
+    <h2 class="poem-title">Pretinha</h2>
+    <div class="poem-body">Via você no ponto de ônibus perto da minha escola,
+Todos os dias fazia questão de passar na sua frente com a esperança que você me notasse.
+Seu black incrível, as tranças, esses brincos de argola e esse gloss com cheiro de cereja, é uma mistura de nega doce com afro-paty.
+Mas ela sumiu, e sua falta foi alarmante.
+Finalmente tive coragem de te chamar, on-line, claro.
+Fui direto ao ponto e me declarei, sem medo de me achar louca e alucinada, citei uma música do Seu Jorge: "Pretinha, faço tudo pelo nosso amor". Sim, tomei um puta fora. Já tinha trilhado nosso destino, todas as vezes que a via.</div>
+  </article>
+
+  <article class="poem reveal" id="lugar-nenhum">
+    <h2 class="poem-title">Lugar Nenhum</h2>
+    <div class="poem-body">Estou cansada de falar, explicar de diferentes formas, tentando não fazer ser repetitivo, mas você não me dá palco, muito menos tenta me entender.
+Continuo alugando lugar nenhum e sendo fantasma, apenas fazendo você sentir pequenos calafrios.</div>
+  </article>
+
+  <article class="poem reveal" id="responsabilidade">
+    <h2 class="poem-title">Responsabilidade</h2>
+    <div class="poem-body">A vida não me deu tempo para ser imatura ou irresponsável.
+Desde que criei consciência, conheci as consequências.
+Tudo que fazemos gera consequências, boas ou ruins, e se torna mais difícil ter que projetar seus passos a cada milissegundo, sem poder cometer deslizes.</div>
+  </article>
+
+  <article class="poem reveal" id="desabafo">
+    <h2 class="poem-title">Desabafo</h2>
+    <div class="poem-body">Muitas vezes é torturante ler o que sai de mim, do mesmo jeito que é aliviante quando sai, e eu sei que é mais ainda para os próximos.
+Não me pergunte, não me julgue, não julgue ele ou ela. Tudo que você lê aqui e te alfineta é um problema interno seu, resolva ou viva com ele.</div>
+  </article>
+
+  <article class="poem reveal" id="opio">
+    <h2 class="poem-title">Ópio</h2>
+    <div class="poem-body">Estou acabando com a minha vida, surto e rapidamente está tudo escuro.
+A cada dilúvio, surge um novo mundo, que de novo não tem absolutamente nada.
+Sempre as mesmas informações e perguntas que não têm respostas.
+Quando abro os olhos, tenho sensação de algo novo, mas logo percebo o estrago.
+Pelo menos, o Ópio está do meu lado. Ninguém percebe a melancolia, o medo, a dor, as cicatrizes ou meus ossos expostos.
+A cama se tornou uma cova, e os cobertores e travesseiros, a terra.</div>
+  </article>
+
+  <article class="poem reveal" id="titulo">
+    <h2 class="poem-title">Título</h2>
+    <div class="poem-body">Já tem algumas horas que estou olhando para você e não consegui imaginar nem um título.
+Estou moendo o meu cérebro para extrair algo, mas só vejo uma tela preta, ouço zumbidos e sinto peso.</div>
+  </article>
+
+  <article class="poem reveal" id="suco-de-vidro">
+    <h2 class="poem-title">Suco de Vidro</h2>
+    <div class="poem-body">Faça o meu corpo de tela.
+Me dê cor enquanto fica deslumbrado com as curvas e perdido com o enigma.
+Eu sei que tá sentindo a sala esquentar, o meu corpo desnudo pinga e todos os caminhos te levam para o mesmo lugar.
+Sem colocar as mãos, ou vai me romper ou corromper, por mais que o meu corpo seja mármore, apenas pincéis e olhares.
+Nunca beberá da minha fonte, sai apenas suco de vidro. Mas se tiver coragem, beba e conhecerá a verdadeira explosão interna.</div>
+  </article>
+
+  <article class="poem reveal" id="fases-2">
+    <h2 class="poem-title">Fases <span style="font-size:.7em;color:var(--muted)">II</span></h2>
+    <div class="poem-body">Faces, fases, falhas, familiares...
+Quando desperto ao amanhecer, não sou ninguém, estática na cama na mesma posição que dormi.
+Queria falar "logo me levanto", mas não é assim, demora horas.
+Em algum momento, me levanto e me olho no espelho, semblante apagado.
+Dou um jeito, faço um delineado para ressaltar um olhar confiante, batom para exalar força e blush para delicadeza.
+Me sinto outra pessoa, posso fazer tudo aquilo que não tenho coragem, porém me espanta, mas a maquiagem disfarçar, assim como o sorriso e a postura, aparecer e falar em bom tom.</div>
+  </article>
+
+  <article class="poem reveal" id="aflicao">
+    <h2 class="poem-title">Aflição</h2>
+    <div class="poem-body">Não consigo me desfazer de todas as marcas de nossas vidas passadas.
+Não quero pensar no fim do mundo, não quero ceder ao peso do inferno.
+Eu não tenho escolha, você não tem escolha. Se não seguir você é condenado, se seguir também, o peso da dúvida e a confusão.
+É o fim dos tempos, mas como saber se realmente é o momento?
+Desgraça sempre aconteceu, mas agora temos uma noção maior.
+É ridículo existir com tanta negligência divina.</div>
+  </article>
+
+  <article class="poem reveal" id="ampulheta">
+    <h2 class="poem-title">Ampulheta</h2>
+    <div class="poem-body">Vivendo em função da morte
+Já chegou a virada de ano e, com ela, todos viramos
+Mais uma temporada, impressionante.
+Quem vai ser descartado da série? Por pura ignorância ou obra do destino? Não tem spoiler,
+Não tem como pular 30 segundos para frente ou para trás.</div>
+  </article>
+
+  <article class="poem reveal" id="pedra">
+    <h2 class="poem-title">Pedra</h2>
+    <div class="poem-body">Quero te esquecer ou não te envolver em algo que eu faça,
+Todas as vezes que eu me distraio, tropeço em você.
+Os meus dedos estão sangrando e inchados, mesmo assim, não consigo desviar.
+Eu sinto raiva, como a doença.
+Quando vejo luz, me escondo, sinto dificuldade em engolir, em te engolir.
+Tem uma parte de mim que não quer ser salva e insiste.</div>
+  </article>
+
+  <article class="poem reveal" id="chuva">
+    <h2 class="poem-title">Chuva</h2>
+    <div class="poem-body">Noite chuvosa, né? Essas noites me lembram de comprimidos, lágrimas, hematomas, bebidas e sangue.
+Estou sentada no mesmo banheiro, banheiro que foi palco muitas vezes, e eu tenho tudo aqui em minhas mãos. Tá sendo difícil e impulsivo, eu não posso ter uma recaída, tem muitos obstáculos.
+O meu corpo sendo usado de manequim não me permite mais ter marcas.
+Queria poder desabar e voltar ao que era como a chuva, quando não aguentam mais, morrem e renascem como se nada tivesse acontecido.
+Eu sinto raiva e, em algum momento, me peguei puxando os meus cabelos.
+Eu sou uma puta egoísta, mas eu acho que não mereço isso, eu acho que é proposital, você me conhece.</div>
+  </article>
+
+  <article class="poem reveal" id="me-chamam-de-melancolia">
+    <h2 class="poem-title">Me Chamam de Melancolia</h2>
+    <div class="poem-body">Ouço o eco que a minha voz faz dentro de mim.
+Me encho quando estou com você e sinto que são pedacinhos temporários, faço um quebra-cabeça e, lentamente, as peças vão sumindo.
+Melancolia que nunca passa, mas eu penso em todas as formas de te matar, os lugares, utensílios e as torturas, pois não poderia ser qualquer uma.
+Cada detalhe malicioso, e o prazer que eu sentia só de pensar o quanto você iria sofrer.</div>
+  </article>
+
+  <article class="poem reveal" id="mais-um-dia">
+    <h2 class="poem-title">Mais Um Dia</h2>
+    <div class="poem-body">Hoje acordei com necessidade de sumir, o meu corpo não me obedece e eu sei que tenho muitas coisas para fazer.
+Mas a parte de mim que quer desistir grita mais forte, o meu quarto tá bagunçado e isso reflete muito em mim.</div>
+  </article>
+
+  <article class="poem reveal" id="anestesia">
+    <h2 class="poem-title">Anestesia</h2>
+    <div class="poem-body">Você me ama?
+Ok, você diz que sim, mas eu não sinto.
+Eu estou em prantos esperando retorno.
+Amor que não toca, mas machuca.
+No momento, me encontro perdida, eu não quero ter que explicar algo que nem eu mesma sei ou sobre os meus pequenos versos, o lugar onde você se encontra.</div>
+  </article>
+
+</main>
 
 <footer>
-  <button class="nav-btn" id="btn-prev">← Anterior</button>
-  <div id="page-info">— / —</div>
-  <button class="nav-btn" id="btn-next">Próxima →</button>
+  <p class="f-title">Tristeza Faz <em>Parte</em></p>
+  <p>Nani Ely · Editora Viseu, 2024</p>
+  <p style="margin-top:24px">© 2024 Nani Ely. Todos os direitos reservados.</p>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<button id="top-btn" aria-label="Voltar ao topo" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
 <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// progress bar
+const bar = document.getElementById('bar');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  bar.style.width = pct + '%';
+  document.getElementById('top-btn').classList.toggle('show', h.scrollTop > 400);
+}, {passive:true});
 
-  const canvas = document.getElementById('pdf-canvas');
-  const ctx = canvas.getContext('2d');
-  const btnPrev = document.getElementById('btn-prev');
-  const btnNext = document.getElementById('btn-next');
-  const pageInfo = document.getElementById('page-info');
-  const loading = document.getElementById('loading');
-  const viewer = document.getElementById('viewer');
+// reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
+}, {threshold:.08, rootMargin:'0px 0px -40px 0px'});
 
-  let pdfDoc = null;
-  let currentPage = 1;
-  let rendering = false;
+document.querySelectorAll('.reveal').forEach(el => {
+  el.classList.add('poem'); // reuse poem anim
+  observer.observe(el);
+});
 
-  const isMobile = () => window.innerWidth < 700;
+// TOC
+const tocEl = document.getElementById('toc');
+const tocList = document.getElementById('toc-list');
+const poems = document.querySelectorAll('article.poem');
 
-  function computeScale(page) {
-    const dpr = window.devicePixelRatio || 1;
-    const vp = page.getViewport({ scale: 1 });
-    const padding = isMobile() ? 16 : 32;
-    const availW = viewer.clientWidth - padding;
+poems.forEach(p => {
+  const title = p.querySelector('.poem-title').textContent.trim();
+  const li = document.createElement('li');
+  const a = document.createElement('a');
+  a.href = '#' + p.id;
+  a.textContent = title;
+  a.addEventListener('click', () => tocEl.classList.remove('open'));
+  li.appendChild(a);
+  tocList.appendChild(li);
+});
 
-    if (isMobile()) {
-      // Preenche a largura inteira; usuário rola verticalmente
-      return (availW / vp.width) * Math.min(dpr, 2);
-    }
-
-    const availH = viewer.clientHeight - 48;
-    const scaleW = availW / vp.width;
-    const scaleH = availH / vp.height;
-    return Math.min(scaleW, scaleH, 2.5) * Math.min(dpr, 2);
-  }
-
-  async function renderPage(num) {
-    if (rendering) return;
-    rendering = true;
-
-    const page = await pdfDoc.getPage(num);
-    const scale = computeScale(page);
-    const vp = page.getViewport({ scale });
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    canvas.width = vp.width;
-    canvas.height = vp.height;
-    canvas.style.width = (vp.width / dpr) + 'px';
-    canvas.style.height = (vp.height / dpr) + 'px';
-
-    await page.render({ canvasContext: ctx, viewport: vp }).promise;
-
-    pageInfo.innerHTML = `<strong>${num}</strong> / ${pdfDoc.numPages}`;
-    btnPrev.disabled = num <= 1;
-    btnNext.disabled = num >= pdfDoc.numPages;
-
-    rendering = false;
-  }
-
-  async function init() {
-    const pdfPath = './TristezaFazParte.pdf';
-    pdfDoc = await pdfjsLib.getDocument(pdfPath).promise;
-    loading.style.display = 'none';
-    await renderPage(currentPage);
-  }
-
-  btnPrev.addEventListener('click', async () => {
-    if (currentPage <= 1) return;
-    currentPage--;
-    viewer.scrollTop = 0;
-    await renderPage(currentPage);
-  });
-
-  btnNext.addEventListener('click', async () => {
-    if (currentPage >= pdfDoc?.numPages) return;
-    currentPage++;
-    viewer.scrollTop = 0;
-    await renderPage(currentPage);
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') btnPrev.click();
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') btnNext.click();
-  });
-
-  window.addEventListener('resize', () => {
-    if (pdfDoc) renderPage(currentPage);
-  });
-
-  // Swipe para navegar no mobile
-  let touchStartX = 0;
-  let touchStartY = 0;
-  viewer.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-  viewer.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-      if (dx < 0) btnNext.click();
-      else btnPrev.click();
-    }
-  }, { passive: true });
-
-  init().catch(err => {
-    loading.innerHTML = `<div style="color:#c0392b;font-size:13px;text-align:center;padding:20px">
-      Erro ao carregar o livro.<br><small style="color:#666;margin-top:8px;display:block">${err.message}</small>
-    </div>`;
-  });
+document.getElementById('toc-btn').addEventListener('click', () => tocEl.classList.add('open'));
+document.getElementById('toc-close').addEventListener('click', () => tocEl.classList.remove('open'));
+tocEl.addEventListener('click', e => { if(e.target === tocEl) tocEl.classList.remove('open'); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape') tocEl.classList.remove('open'); });
 </script>
-
 </body>
 </html>
