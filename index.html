@@ -79,12 +79,13 @@
       left: 0;
       right: 0;
       overflow-y: auto;
-      overflow-x: hidden;
+      overflow-x: auto;
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding: 24px 16px;
+      padding: 16px 8px;
       background: var(--bg);
+      -webkit-overflow-scrolling: touch;
     }
 
     #canvas-wrapper {
@@ -96,8 +97,6 @@
     canvas#pdf-canvas {
       display: block;
       background: white;
-      max-width: 100%;
-      height: auto;
     }
 
     footer {
@@ -202,7 +201,8 @@
 
     @media (max-width: 600px) {
       .book-author, .divider { display: none; }
-      .nav-btn { padding: 8px 14px; font-size: 12px; }
+      .nav-btn { padding: 10px 18px; font-size: 13px; }
+      footer { gap: 16px; }
     }
   </style>
 </head>
@@ -251,13 +251,23 @@
   let currentPage = 1;
   let rendering = false;
 
+  const isMobile = () => window.innerWidth < 700;
+
   function computeScale(page) {
-    const vw = viewer.clientWidth - 32;
-    const vh = viewer.clientHeight - 48;
+    const dpr = window.devicePixelRatio || 1;
     const vp = page.getViewport({ scale: 1 });
-    const scaleW = vw / vp.width;
-    const scaleH = vh / vp.height;
-    return Math.min(scaleW, scaleH, 2.5);
+    const padding = isMobile() ? 16 : 32;
+    const availW = viewer.clientWidth - padding;
+
+    if (isMobile()) {
+      // Preenche a largura inteira; usuário rola verticalmente
+      return (availW / vp.width) * Math.min(dpr, 2);
+    }
+
+    const availH = viewer.clientHeight - 48;
+    const scaleW = availW / vp.width;
+    const scaleH = availH / vp.height;
+    return Math.min(scaleW, scaleH, 2.5) * Math.min(dpr, 2);
   }
 
   async function renderPage(num) {
@@ -267,9 +277,12 @@
     const page = await pdfDoc.getPage(num);
     const scale = computeScale(page);
     const vp = page.getViewport({ scale });
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     canvas.width = vp.width;
     canvas.height = vp.height;
+    canvas.style.width = (vp.width / dpr) + 'px';
+    canvas.style.height = (vp.height / dpr) + 'px';
 
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
 
@@ -309,6 +322,22 @@
   window.addEventListener('resize', () => {
     if (pdfDoc) renderPage(currentPage);
   });
+
+  // Swipe para navegar no mobile
+  let touchStartX = 0;
+  let touchStartY = 0;
+  viewer.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  viewer.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) btnNext.click();
+      else btnPrev.click();
+    }
+  }, { passive: true });
 
   init().catch(err => {
     loading.innerHTML = `<div style="color:#c0392b;font-size:13px;text-align:center;padding:20px">
