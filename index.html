@@ -5,19 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tristeza Faz Parte — Nani Ely</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
-  --bg:#0d0d0d;
-  --surface:#111;
-  --text:#ddd5cc;
-  --muted:#5a534e;
+  --bg:#faf8f4;
+  --paper:#f3ede4;
+  --text:#1a1209;
+  --muted:#8a7e72;
+  --light:#c8bfb2;
   --red:#c0392b;
-  --red2:#7a2320;
-  --border:#1e1e1e;
-  --max:660px;
+  --red2:#9b2e23;
+  --border:#ddd5c8;
+  --max:700px;
 }
 
 html{scroll-behavior:smooth}
@@ -31,330 +32,454 @@ body{
   overflow-x:hidden;
 }
 
-/* grain overlay */
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  background-size:200px;
-  opacity:.035;
-  pointer-events:none;
-  z-index:9999;
-}
+/* ─── progress bar ─── */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--red);z-index:500;transition:width .1s}
 
-/* progress bar */
-#bar{
-  position:fixed;
-  top:0;left:0;
-  height:2px;
-  width:0%;
-  background:var(--red);
-  z-index:200;
-  transition:width .1s linear;
-}
-
-/* header */
+/* ─── header ─── */
 header{
-  position:sticky;
-  top:0;
-  background:rgba(13,13,13,.92);
+  position:sticky;top:0;
+  background:rgba(250,248,244,.95);
   backdrop-filter:blur(8px);
   border-bottom:1px solid var(--border);
-  padding:14px 24px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  padding:0 28px;
+  height:52px;
+  display:flex;align-items:center;justify-content:space-between;
   z-index:100;
 }
 
 .hlogo{
-  font-family:'Playfair Display',serif;
-  font-size:13px;
-  letter-spacing:.18em;
+  font-family:'Oswald',sans-serif;
+  font-size:14px;font-weight:700;
+  letter-spacing:.08em;
   text-transform:uppercase;
-  color:var(--text);
-  text-decoration:none;
+  color:var(--text);text-decoration:none;
 }
-.hlogo em{color:var(--red);font-style:normal}
+.hlogo .r{color:var(--red)}
 
 #toc-btn{
-  background:none;
-  border:none;
-  color:var(--muted);
-  font-size:11px;
-  letter-spacing:.15em;
-  text-transform:uppercase;
-  cursor:pointer;
+  background:none;border:none;
+  font-family:'EB Garamond',serif;
+  font-size:14px;letter-spacing:.1em;
+  color:var(--muted);cursor:pointer;
   padding:6px 0;
   transition:color .2s;
 }
-#toc-btn:hover{color:var(--text)}
+#toc-btn:hover{color:var(--red)}
 
-/* toc drawer */
-#toc{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.85);
-  backdrop-filter:blur(12px);
-  z-index:150;
-  overflow-y:auto;
-  padding:60px 32px 40px;
-  transform:translateX(100%);
-  transition:transform .35s cubic-bezier(.4,0,.2,1);
-}
-#toc.open{transform:translateX(0)}
-
-#toc-close{
-  position:absolute;
-  top:20px;right:24px;
-  background:none;border:none;
-  color:var(--muted);
-  font-size:22px;cursor:pointer;
-}
-#toc-close:hover{color:var(--text)}
-
-#toc h2{
-  font-family:'Playfair Display',serif;
-  font-size:11px;
-  letter-spacing:.25em;
-  text-transform:uppercase;
-  color:var(--red);
-  margin-bottom:28px;
-}
-
-#toc ul{
-  list-style:none;
-  columns:2;
-  column-gap:40px;
-}
-@media(max-width:480px){#toc ul{columns:1}}
-
-#toc li{margin-bottom:10px}
-
-#toc a{
-  color:var(--muted);
-  text-decoration:none;
-  font-size:14px;
-  letter-spacing:.05em;
-  transition:color .2s;
-}
-#toc a:hover{color:var(--red)}
-
-/* hero */
+/* ─── hero ─── */
 .hero{
   min-height:100svh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+  display:grid;
+  place-items:center;
   text-align:center;
-  padding:60px 24px;
+  padding:80px 24px 60px;
   position:relative;
-  border-bottom:1px solid var(--border);
+  background:var(--bg);
+  overflow:hidden;
 }
 
-.hero-line{
-  width:1px;
-  height:80px;
-  background:linear-gradient(to bottom,transparent,var(--red));
-  margin:0 auto 48px;
-  animation:growline 1.2s ease forwards;
+/* big red vertical bar — like the cover */
+.hero::before{
+  content:'';
+  position:absolute;
+  left:clamp(24px,6vw,80px);
+  top:10%;bottom:10%;
+  width:4px;
+  background:var(--red);
+  opacity:.9;
 }
 
-@keyframes growline{from{height:0;opacity:0}to{height:80px;opacity:1}}
+/* red corner ornaments in hero */
+.hero::after{
+  content:'';
+  position:absolute;
+  bottom:40px;right:clamp(24px,6vw,80px);
+  width:60px;height:60px;
+  border-right:3px solid var(--red);
+  border-bottom:3px solid var(--red);
+  opacity:.5;
+}
+
+.hero-inner{
+  position:relative;
+  z-index:1;
+}
 
 .hero-tag{
-  font-size:11px;
-  letter-spacing:.3em;
+  font-size:11px;letter-spacing:.35em;
   text-transform:uppercase;
   color:var(--muted);
-  margin-bottom:20px;
-  animation:fadein 1s .3s both;
+  margin-bottom:24px;
+  animation:fadein 1s .2s both;
 }
 
-.hero h1{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(38px,9vw,80px);
+.hero-title{
+  font-family:'Oswald',sans-serif;
+  font-size:clamp(52px,13vw,120px);
   font-weight:700;
-  line-height:1.05;
+  line-height:.95;
   letter-spacing:-.01em;
-  animation:fadein 1s .5s both;
+  text-transform:uppercase;
+  color:var(--text);
+  animation:fadein 1s .4s both;
 }
 
-.hero h1 em{
-  color:var(--red);
-  font-style:normal;
-}
+.hero-title .r{color:var(--red)}
 
 .hero-author{
-  font-family:'Playfair Display',serif;
+  font-family:'EB Garamond',serif;
   font-style:italic;
-  font-size:18px;
+  font-size:clamp(16px,2.5vw,22px);
   color:var(--muted);
   margin-top:20px;
-  animation:fadein 1s .7s both;
+  animation:fadein 1s .6s both;
+  letter-spacing:.05em;
 }
 
 .hero-scroll{
-  position:absolute;
-  bottom:32px;
-  left:50%;
+  position:absolute;bottom:28px;left:50%;
   transform:translateX(-50%);
-  font-size:11px;
-  letter-spacing:.2em;
-  text-transform:uppercase;
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--light);
+  animation:fadein 1s 1.2s both,bob 2s 1.5s ease-in-out infinite;
+}
+
+@keyframes fadein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+
+/* ─── red decorative divider ─── */
+.red-divider{
+  display:flex;align-items:center;gap:16px;
+  padding:0 0 0 0;margin:0;
+}
+.red-divider::before{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+.red-divider::after{
+  content:'';width:32px;height:3px;background:var(--red);
+}
+
+/* ─── content wrapper ─── */
+.content{max-width:var(--max);margin:0 auto;padding:0 28px}
+
+/* ─── back cover section ─── */
+.backcover{
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  background:var(--paper);
+  padding:72px 0;
+}
+
+.backcover-inner{
+  max-width:var(--max);margin:0 auto;
+  padding:0 28px;
+  display:grid;
+  grid-template-columns:1fr 1.6fr;
+  gap:48px;
+  align-items:start;
+}
+@media(max-width:640px){.backcover-inner{grid-template-columns:1fr}}
+
+.autora-foto{
+  position:relative;
+}
+.autora-foto img{
+  width:100%;
+  max-width:260px;
+  display:block;
+  object-fit:cover;
+  filter:grayscale(15%) contrast(1.05);
+}
+
+/* red corner on photo */
+.autora-foto::before{
+  content:'';
+  position:absolute;
+  top:-12px;left:-12px;
+  width:36px;height:36px;
+  border-top:3px solid var(--red);
+  border-left:3px solid var(--red);
+  z-index:1;
+}
+.autora-foto::after{
+  content:'';
+  position:absolute;
+  bottom:-12px;right:-12px;
+  width:36px;height:36px;
+  border-bottom:3px solid var(--red);
+  border-right:3px solid var(--red);
+}
+
+.backcover-text{}
+
+.quote-block{
+  position:relative;
+  padding:24px 0 24px 0;
+  margin-bottom:32px;
+}
+.quote-block::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);
+}
+.quote-block::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--border);
+}
+
+.quote-block p{
+  font-family:'EB Garamond',serif;
+  font-style:italic;
+  font-size:clamp(16px,2vw,18px);
+  line-height:1.75;
+  color:var(--text);
+}
+
+.bio-text{
+  font-size:clamp(14px,1.8vw,15.5px);
+  line-height:1.75;
   color:var(--muted);
-  animation:fadein 1s 1.2s both, bounce 2s 2s ease-in-out infinite;
 }
+.bio-text strong{color:var(--text)}
 
-@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
-@keyframes fadein{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-
-/* content wrapper */
-.content{
-  max-width:var(--max);
-  margin:0 auto;
-  padding:0 24px;
-}
-
-/* warning */
-.warning{
-  padding:60px 0 40px;
-  opacity:0;transform:translateY(20px);
-  transition:opacity .8s,transform .8s;
-}
-.warning.visible{opacity:1;transform:none}
+/* ─── warning / epigraph ─── */
+.warning-section{padding:56px 0 40px}
 
 .warning-inner{
-  border-left:2px solid var(--red2);
-  padding-left:20px;
+  border-left:3px solid var(--red);
+  padding-left:18px;
 }
 .warning-label{
-  font-size:10px;
-  letter-spacing:.3em;
-  text-transform:uppercase;
-  color:var(--red);
-  margin-bottom:10px;
-  display:block;
+  font-size:10px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--red);margin-bottom:8px;display:block;
 }
-.warning p{
-  font-size:15px;
-  color:var(--muted);
-  line-height:1.7;
-}
+.warning-inner p{font-size:15px;color:var(--muted);line-height:1.7}
 
-/* epigraph */
-.epigraph{
-  padding:60px 0;
+.epigraph-section{
+  padding:40px 0 64px;
   text-align:right;
   border-bottom:1px solid var(--border);
-  opacity:0;transform:translateY(20px);
-  transition:opacity .8s,transform .8s;
+  position:relative;
 }
-.epigraph.visible{opacity:1;transform:none}
+.epigraph-section::after{
+  content:'';
+  position:absolute;bottom:0;right:0;
+  width:40px;height:3px;background:var(--red);
+}
 
-.epigraph blockquote{
-  font-family:'Playfair Display',serif;
+.epigraph-section blockquote{
+  font-family:'EB Garamond',serif;
   font-style:italic;
-  font-size:clamp(16px,3vw,20px);
-  line-height:1.6;
+  font-size:clamp(16px,2.5vw,20px);
+  line-height:1.65;
   color:var(--text);
 }
-
-.epigraph cite{
-  display:block;
-  margin-top:12px;
-  font-size:13px;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:var(--muted);
-  font-style:normal;
+.epigraph-section cite{
+  display:block;margin-top:12px;
+  font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);font-style:normal;
 }
 
-/* poem */
-.poem{
-  padding:80px 0;
-  border-bottom:1px solid var(--border);
-  opacity:0;
-  transform:translateY(32px);
-  transition:opacity .9s ease, transform .9s ease;
-}
-.poem.visible{opacity:1;transform:none}
-
-.poem-title{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(13px,3vw,15px);
-  font-weight:700;
-  letter-spacing:.3em;
-  text-transform:uppercase;
-  color:var(--text);
-  margin-bottom:36px;
-  display:inline-block;
+/* ─── TOC ─── */
+.toc-section{
+  padding:72px 0;
+  border-bottom:3px solid var(--text);
   position:relative;
 }
 
-.poem-title::after{
+.toc-section::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:3px;background:var(--text);
+}
+
+.toc-header{
+  display:flex;align-items:baseline;gap:16px;
+  margin-bottom:48px;
+}
+
+.toc-header h2{
+  font-family:'Oswald',sans-serif;
+  font-size:clamp(13px,2vw,15px);
+  font-weight:700;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--text);
+}
+.toc-header::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.toc-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+}
+@media(max-width:480px){.toc-grid{grid-template-columns:1fr}}
+
+.toc-item{
+  display:flex;align-items:baseline;
+  padding:9px 0;
+  border-bottom:1px dotted var(--border);
+  gap:8px;
+}
+.toc-item a{
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  color:var(--text);text-decoration:none;
+  transition:color .2s;
+  flex:1;
+}
+.toc-item a:hover{color:var(--red)}
+.toc-item .dots{flex:1;height:1px;border-bottom:1px dotted var(--border);min-width:12px}
+.toc-item .pnum{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* ─── poem ─── */
+.poem-section{
+  padding:76px 0;
+  border-bottom:1px solid var(--border);
+  position:relative;
+  opacity:0;transform:translateY(28px);
+  transition:opacity .8s ease,transform .8s ease;
+}
+.poem-section.visible{opacity:1;transform:none}
+
+/* corner ornament on each poem */
+.poem-section::before{
   content:'';
   position:absolute;
-  bottom:-8px;left:0;
-  height:1px;
-  width:0;
-  background:var(--red);
-  transition:width .8s .2s ease;
+  top:24px;right:0;
+  width:28px;height:28px;
+  border-top:2px solid var(--red);
+  border-right:2px solid var(--red);
+  opacity:.4;
+  transition:opacity .5s;
 }
-.poem.visible .poem-title::after{width:100%}
+.poem-section.visible::before{opacity:1}
+
+.poem-title{
+  font-family:'Oswald',sans-serif;
+  font-size:clamp(13px,2vw,15px);
+  font-weight:700;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--text);
+  margin-bottom:32px;
+  display:inline-block;
+  position:relative;
+}
+.poem-title::after{
+  content:'';
+  position:absolute;bottom:-6px;left:0;
+  height:2px;width:0;background:var(--red);
+  transition:width .7s .1s ease;
+}
+.poem-section.visible .poem-title::after{width:100%}
 
 .poem-body{
+  font-family:'EB Garamond',serif;
   font-size:clamp(17px,2.5vw,19px);
   line-height:1.95;
   color:var(--text);
   white-space:pre-line;
 }
 
-/* footer */
-footer{
-  padding:80px 24px;
-  text-align:center;
-  border-top:1px solid var(--border);
+/* ─── alternating left corner ornament ─── */
+.poem-section:nth-child(even)::before{
+  right:auto;left:0;
+  border-right:none;border-left:2px solid var(--red);
+  border-top:2px solid var(--red);
+}
+.poem-section:nth-child(odd)::after{
+  content:'';
+  position:absolute;
+  bottom:24px;left:0;
+  width:20px;height:20px;
+  border-bottom:2px solid var(--red);
+  border-left:2px solid var(--red);
+  opacity:.3;
+  transition:opacity .5s .2s;
+}
+.poem-section.visible:nth-child(odd)::after{opacity:.7}
+
+/* ─── floating side red bar (desktop) ─── */
+@media(min-width:900px){
+  .content{position:relative}
+  .content::before{
+    content:'';
+    position:fixed;
+    left:calc(50% - 380px);
+    top:20%;bottom:20%;
+    width:2px;
+    background:linear-gradient(to bottom,transparent,var(--red) 30%,var(--red) 70%,transparent);
+    opacity:.12;
+    pointer-events:none;
+  }
 }
 
-footer .f-title{
-  font-family:'Playfair Display',serif;
-  font-size:22px;
+/* ─── footer ─── */
+footer{
+  padding:80px 24px 60px;
+  text-align:center;
+  background:var(--paper);
+  border-top:3px solid var(--text);
+  position:relative;
+}
+footer::before{
+  content:'';
+  position:absolute;top:3px;left:0;right:0;height:1px;background:var(--border);
+}
+
+.footer-title{
+  font-family:'Oswald',sans-serif;
+  font-size:28px;font-weight:700;
+  letter-spacing:.03em;text-transform:uppercase;
   margin-bottom:8px;
 }
-footer .f-title em{color:var(--red);font-style:normal}
+.footer-title .r{color:var(--red)}
 
-footer p{
-  font-size:13px;
-  color:var(--muted);
-  letter-spacing:.05em;
-  margin-top:6px;
-}
+footer p{font-size:13px;color:var(--muted);margin-top:6px;letter-spacing:.05em}
 
-/* back to top */
+/* ─── back to top ─── */
 #top-btn{
-  position:fixed;
-  bottom:28px;right:24px;
-  width:40px;height:40px;
-  border-radius:50%;
-  background:var(--red2);
-  border:1px solid var(--red);
-  color:var(--text);
-  font-size:18px;
-  cursor:pointer;
+  position:fixed;bottom:24px;right:20px;
+  width:38px;height:38px;border-radius:2px;
+  background:var(--red);border:none;
+  color:#fff;font-size:16px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  opacity:0;
-  transition:opacity .3s,background .2s;
-  z-index:90;
+  opacity:0;transition:opacity .3s,background .2s;z-index:90;
 }
 #top-btn.show{opacity:1}
-#top-btn:hover{background:var(--red)}
+#top-btn:hover{background:var(--red2)}
+
+/* ─── section ornament strip ─── */
+.ornament{
+  height:40px;
+  display:flex;align-items:center;gap:0;
+  overflow:hidden;
+  position:relative;
+}
+.ornament::before{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+.ornament-center{
+  display:flex;gap:8px;align-items:center;padding:0 16px;
+}
+.ornament-center span{
+  display:block;width:6px;height:6px;
+  border:1.5px solid var(--red);
+  transform:rotate(45deg);
+}
+.ornament-center span:nth-child(2){
+  background:var(--red);
+}
+.ornament::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+/* ─── scroll reveal ─── */
+.reveal{
+  opacity:0;transform:translateY(20px);
+  transition:opacity .8s ease,transform .8s ease;
+}
+.reveal.visible{opacity:1;transform:none}
 
 @media(max-width:600px){
-  .poem{padding:60px 0}
-  #toc{padding:50px 24px 40px}
+  .poem-section{padding:56px 0}
+  header{padding:0 16px}
+  .content{padding:0 20px}
+  .backcover-inner{padding:0 20px}
 }
 </style>
 </head>
@@ -362,36 +487,48 @@ footer p{
 
 <div id="bar"></div>
 
-<!-- TOC drawer -->
-<div id="toc" role="dialog" aria-label="Sumário">
-  <button id="toc-close" aria-label="Fechar">✕</button>
-  <h2>Sumário</h2>
-  <ul id="toc-list"></ul>
-</div>
-
 <header>
-  <a href="#hero" class="hlogo">Tristeza Faz <em>Parte</em></a>
+  <a href="#hero" class="hlogo">Tristeza Faz p<span class="r">ARTE</span></a>
   <button id="toc-btn">Sumário</button>
 </header>
 
+<!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="hero">
-  <div class="hero-line"></div>
-  <p class="hero-tag">Nani Ely · 2024</p>
-  <h1>Tristeza Faz<br><em>Parte</em></h1>
-  <p class="hero-author">poesia</p>
+  <div class="hero-inner">
+    <p class="hero-tag">Nani Ely · 2024 · Poesia</p>
+    <h1 class="hero-title">
+      TRISTEZA<br>FAZ<br>p<span class="r">ARTE</span>
+    </h1>
+    <p class="hero-author">Nani Ely</p>
+  </div>
   <span class="hero-scroll">↓ role para ler</span>
 </section>
 
-<main class="content">
+<!-- ═══════════ CONTRA-CAPA / AUTORA ═══════════ -->
+<section class="backcover">
+  <div class="backcover-inner">
+    <div class="autora-foto reveal">
+      <img src="autora.png" alt="Nani Ely" width="260">
+    </div>
+    <div class="backcover-text reveal">
+      <div class="quote-block">
+        <p>Tudo começa quando nosso físico e mental não aguentam mais, e você começa a vomitar como defesa para expulsar as impurezas. Mas algumas vezes não jogamos para fora e, em algum momento, nos encontramos em completa destruição com abominação da desolação. Porém não se machuque, transforme seu ódio em poesia.</p>
+      </div>
+      <p class="bio-text"><strong>Naniely Pereira de Almeida</strong> nasceu no dia 26 de janeiro de 2004, em Felisburgo, município brasileiro do estado de Minas Gerais. Filha de mãe solo — a Cleuza Pereira da Silva — na infância, sempre foi fascinada por desenhar, cantar e escrever poesias. Hoje ela realiza o sonho de ter o seu livro e exclama ser mais que uma prostituição, pois está vendendo o que há de mais íntimo. Ela começou a escrever e desenhar desde pequena, pois sempre foi um refúgio e aconchego, um jeito de lidar com seu transtorno de personalidade borderline. Todas as poesias foram escritas durante episódios de comportamento maníaco de intensidade e carregam dor, tristeza, melancolia, nojo, euforia, peso, delírio, agressividade, vazio e até paixão.</p>
+    </div>
+  </div>
+</section>
 
-  <div class="warning reveal">
+<!-- ═══════════ WARNING + EPIGRAPH ═══════════ -->
+<div class="content">
+  <div class="warning-section reveal">
     <div class="warning-inner">
       <span class="warning-label">Nota da autora</span>
       <p>Este livro não é recomendado para pessoas vulneráveis a conteúdos sensíveis que possam promover desconforto psicológico.</p>
     </div>
   </div>
 
-  <div class="epigraph reveal">
+  <div class="epigraph-section reveal">
     <blockquote>
       "Belezas são coisas acesas por dentro.<br>
       Tristezas são belezas apagadas pelo sofrimento."
@@ -399,7 +536,15 @@ footer p{
     <cite>Gal Costa</cite>
   </div>
 
-  <article class="poem reveal" id="desilusao">
+<!-- ═══════════ SUMÁRIO ═══════════ -->
+  <div class="toc-section reveal" id="sumario">
+    <div class="toc-header"><h2>Sumário</h2></div>
+    <div class="toc-grid" id="toc-grid"></div>
+  </div>
+
+<!-- ═══════════ POEMAS ═══════════ -->
+
+  <article class="poem-section" id="desilusao">
     <h2 class="poem-title">Desilusão</h2>
     <div class="poem-body">Com o meu coração de vidro e o meu cérebro de pedra,
 Sei que vai doer
@@ -417,7 +562,7 @@ Estou triste, mas já dizia o ditado:
 E deixou um vazio, apenas o vazio</div>
   </article>
 
-  <article class="poem reveal" id="amortesalva">
+  <article class="poem-section" id="amortesalva">
     <h2 class="poem-title">Amortesalva</h2>
     <div class="poem-body">Eu não tenho palavras
 Que possam expressar
@@ -435,7 +580,7 @@ Amor te salva.
 A morte salva.</div>
   </article>
 
-  <article class="poem reveal" id="parte-de-mim">
+  <article class="poem-section" id="parte-de-mim">
     <h2 class="poem-title">Parte de Mim</h2>
     <div class="poem-body">Vejo você dançando na sala
 Sorridente e iluminada
@@ -453,7 +598,7 @@ Quando cheguei, fui direto para a adega, peguei um bom vinho, coloquei na taça 
 Vai ser apenas minha.</div>
   </article>
 
-  <article class="poem reveal" id="demonios">
+  <article class="poem-section" id="demonios">
     <h2 class="poem-title">Demônios</h2>
     <div class="poem-body">Demônios não morrem, não vivem
 Talvez posso chamá-los de meus,
@@ -470,7 +615,7 @@ Apenas vivo com eles
 Como diz aquele velho ditado: "tá no inferno abraça o capeta".</div>
   </article>
 
-  <article class="poem reveal" id="nao-vou-superar">
+  <article class="poem-section" id="nao-vou-superar">
     <h2 class="poem-title">Não Vou Superar</h2>
     <div class="poem-body">Minha família é podre e, inconsequentemente, sou também,
 Então cai as minhas lágrimas secas sobre todos aqueles que eu feri.
@@ -483,7 +628,7 @@ Não consigo superar,
 Como uma vez você me disse: "não consigo esquecer esses olhos que já me olharam tão perto a ponto dos cílios se esfregarem".</div>
   </article>
 
-  <article class="poem reveal" id="lorde">
+  <article class="poem-section" id="lorde">
     <h2 class="poem-title">Lorde</h2>
     <div class="poem-body">Sento na privada enquanto meu sangue escorre
 Infelizmente não é o sangue que você está pensando
@@ -502,7 +647,7 @@ Tenho alguns minutos de alegria
 Antes de eles voltarem.</div>
   </article>
 
-  <article class="poem reveal" id="acabou">
+  <article class="poem-section" id="acabou">
     <h2 class="poem-title">Acabou</h2>
     <div class="poem-body">Começou o velho ciclo de ser quebrado igual vidro e ter que achar cada caco para se reconstruir com a esperança de voltar a ser o que era antes.
 Infelizmente, não sinto mais os calafrios,
@@ -519,7 +664,7 @@ E sequelas que nunca vão poder se curar,
 Lembranças que nunca vão poder esquecer.</div>
   </article>
 
-  <article class="poem reveal" id="promete">
+  <article class="poem-section" id="promete">
     <h2 class="poem-title">Promete</h2>
     <div class="poem-body">Eu quero mais que palavras em uma mensagem de texto
 Eu quero mais
@@ -532,7 +677,7 @@ Prometa que não vai me deixar ir
 Me consuma antes que eu suma.</div>
   </article>
 
-  <article class="poem reveal" id="nevoeiro">
+  <article class="poem-section" id="nevoeiro">
     <h2 class="poem-title">Nevoeiro</h2>
     <div class="poem-body">Eu não morri, mas sinto que algo dentro de mim morreu.
 Há anos
@@ -551,7 +696,7 @@ Acho melhor eu cavar nossas covas,
 Me dê suas mãos e se afunde mais comigo...</div>
   </article>
 
-  <article class="poem reveal" id="po">
+  <article class="poem-section" id="po">
     <h2 class="poem-title">Pó</h2>
     <div class="poem-body">As rosas que você me deu viraram pó
 Assim como nós.
@@ -563,7 +708,7 @@ De todas as merdas
 Flores mortas no meu jardim, alimentadas com o suco do seu corpo.</div>
   </article>
 
-  <article class="poem reveal" id="autocontrole">
+  <article class="poem-section" id="autocontrole">
     <h2 class="poem-title">Autocontrole</h2>
     <div class="poem-body">Que a minha tristeza seja autossuficiente,
 Autossuficiente o bastante para preencher o vazio e me deixar completa.
@@ -576,7 +721,7 @@ Que eles se tornem parte de mim,
 Não eu deles.</div>
   </article>
 
-  <article class="poem reveal" id="cristal">
+  <article class="poem-section" id="cristal">
     <h2 class="poem-title">Cristal</h2>
     <div class="poem-body">Você disse que meu coração é uma pedra e, por mais que você tentasse lapidar, você nunca conseguia e estava cogitando em desistir.
 Não quebre meu coração, por favor,
@@ -586,7 +731,7 @@ Então esteja preparado,
 Por mais tóxica frágil ou forte que seja.</div>
   </article>
 
-  <article class="poem reveal" id="nuvem">
+  <article class="poem-section" id="nuvem">
     <h2 class="poem-title">Nuvem</h2>
     <div class="poem-body">Ela tinha o semblante tão firme,
 Firme como quartzo,
@@ -609,7 +754,7 @@ Ela é um ciclo
 Ou ela tenta ser um…</div>
   </article>
 
-  <article class="poem reveal" id="fases-1">
+  <article class="poem-section" id="fases-1">
     <h2 class="poem-title">Fases</h2>
     <div class="poem-body">Eu tenho lá minhas fases
 Fases de dor:
@@ -631,7 +776,7 @@ E eu tento fazer essa a minha verdade,
 Mesmo não sendo.</div>
   </article>
 
-  <article class="poem reveal" id="poeira">
+  <article class="poem-section" id="poeira">
     <h2 class="poem-title">Poeira</h2>
     <div class="poem-body">Abro minha gaveta e me deparo com uma caixa
 Trancada, velha e empoeirada.
@@ -653,7 +798,7 @@ Buracos feitos por traças,
 Enfim, só restaram palavras.</div>
   </article>
 
-  <article class="poem reveal" id="desconexao">
+  <article class="poem-section" id="desconexao">
     <h2 class="poem-title">Desconexão</h2>
     <div class="poem-body">Já são 3h da madrugada
 E infelizmente ainda não dormi,
@@ -679,7 +824,7 @@ Eu acho que a alma tem algum resquício de esperança,
 O suficiente para não desistir, talvez.</div>
   </article>
 
-  <article class="poem reveal" id="por-que">
+  <article class="poem-section" id="por-que">
     <h2 class="poem-title">Por Quê?</h2>
     <div class="poem-body">Eu não sou preenchível
 Procuro algo, mas não acho
@@ -697,7 +842,7 @@ E como não inflamar?
 Se não tem como evitar?</div>
   </article>
 
-  <article class="poem reveal" id="canto-da-cama">
+  <article class="poem-section" id="canto-da-cama">
     <h2 class="poem-title">Canto da Cama</h2>
     <div class="poem-body">Eu vejo que estou no ápice da tristeza quando escrevo poesias,
 No canto da cama eu me deito,
@@ -713,7 +858,7 @@ Dizem que os olhos são o portal para a alma, e mesmo assim me olho no espelho e
 Com o extremo vazio que me encontro.</div>
   </article>
 
-  <article class="poem reveal" id="conforto">
+  <article class="poem-section" id="conforto">
     <h2 class="poem-title">Conforto</h2>
     <div class="poem-body">Me deparo perdida em seus olhos, querendo respostas.
 Mergulhei nesse poço fundo de águas rasas,
@@ -727,7 +872,7 @@ Eu prefiro os seus,
 Seja meu universo e me tire do buraco negro.</div>
   </article>
 
-  <article class="poem reveal" id="poco">
+  <article class="poem-section" id="poco">
     <h2 class="poem-title">Poço</h2>
     <div class="poem-body">Odeio olhar em seus olhos e enxergar outra pessoa
 Se você beijar meu rosto, vai sentir o gosto salgado das minhas lágrimas.
@@ -746,7 +891,7 @@ Eu sei que está tentando me esquentar, mas nem faz diferença nesse frio,
 Talvez eu tenha me tornado o próprio dedo gelado da morte.</div>
   </article>
 
-  <article class="poem reveal" id="va">
+  <article class="poem-section" id="va">
     <h2 class="poem-title">Vá</h2>
     <div class="poem-body">Eu te traí
 Com as minhas próprias lágrimas.
@@ -765,7 +910,7 @@ Mas não tão forte
 Somos uma rosa.</div>
   </article>
 
-  <article class="poem reveal" id="posse">
+  <article class="poem-section" id="posse">
     <h2 class="poem-title">Posse</h2>
     <div class="poem-body">Lágrimas descem sempre nos mesmos lugares e cortam igual navalha
 E está abrindo um abismo tão fundo e escuro
@@ -779,7 +924,7 @@ Uma disputa para ver quem vai me matar primeiro,
 Quem tomará posse de mim.</div>
   </article>
 
-  <article class="poem reveal" id="beijo">
+  <article class="poem-section" id="beijo">
     <h2 class="poem-title">Beijo</h2>
     <div class="poem-body">Seus beijos tinham gosto de poesia e a todo momento queria escrever
 Algumas páginas vazias
@@ -798,7 +943,7 @@ Ou o próprio Satã que decreta:
 "Tudo que era luz se transformou em escuridão".</div>
   </article>
 
-  <article class="poem reveal" id="umbral">
+  <article class="poem-section" id="umbral">
     <h2 class="poem-title">Umbral</h2>
     <div class="poem-body">Quando minha mente me domina, entro no umbral entre vida e morte
 Me vejo na cama prestes a ter um desencarne
@@ -813,7 +958,7 @@ Aos poucos vou me perdendo,
 Minha alma saindo lentamente do meu corpo enquanto você grita socorro.</div>
   </article>
 
-  <article class="poem reveal" id="paralisia">
+  <article class="poem-section" id="paralisia">
     <h2 class="poem-title">Paralisia</h2>
     <div class="poem-body">Você me conhece,
 Me leia com suas palavras,
@@ -831,7 +976,7 @@ Essa é sua parte angelicalmente demoníaca,
 Que vai tentar te destruir até conseguir.</div>
   </article>
 
-  <article class="poem reveal" id="submissao">
+  <article class="poem-section" id="submissao">
     <h2 class="poem-title">Submissão</h2>
     <div class="poem-body">Vou te chamar de fogo para me iluminar,
 Esquente os meus pés e mãos
@@ -854,7 +999,7 @@ Ando sobre cacos de vidro,
 Na areia quente do deserto.</div>
   </article>
 
-  <article class="poem reveal" id="suicidio">
+  <article class="poem-section" id="suicidio">
     <h2 class="poem-title">Suicídio</h2>
     <div class="poem-body">Eu fiz um acordo com diabo,
 Jantar em uma mesa vazia nunca foi tão solitário.
@@ -865,7 +1010,7 @@ Já tinha me matado várias vezes de uma forma muito mais dolorosa para não fer
 Mas dessa vez foi diferente.</div>
   </article>
 
-  <article class="poem reveal" id="dependencia-emocional">
+  <article class="poem-section" id="dependencia-emocional">
     <h2 class="poem-title">Dependência Emocional</h2>
     <div class="poem-body">Eu sinto uma mistura de medo e ódio.
 Quando eu estou com você, é como se eu tivesse anestesiada da vida, mas quando você vai embora, os pesos e as correntes voltam.
@@ -882,7 +1027,7 @@ E eu sinto a corda apertando meu o pescoço
 A cada passo que você dá.</div>
   </article>
 
-  <article class="poem reveal" id="tudo-igual">
+  <article class="poem-section" id="tudo-igual">
     <h2 class="poem-title">Tudo Igual</h2>
     <div class="poem-body">Tá tudo igual,
 Sempre as mesmas respostas,
@@ -898,7 +1043,7 @@ E, para mim, só tem um caminho definitivo onde posso a encontrar,
 Ela sempre me chama e eu sei que te chama também.</div>
   </article>
 
-  <article class="poem reveal" id="equilibrio">
+  <article class="poem-section" id="equilibrio">
     <h2 class="poem-title">Equilíbrio</h2>
     <div class="poem-body">Grita nua, que eu vou materializar todo nosso ódio em um papel.
 Vamos fazer nosso antigo testamento,
@@ -917,7 +1062,7 @@ Nosso equilíbrio,
 Corpo e alma.</div>
   </article>
 
-  <article class="poem reveal" id="mar">
+  <article class="poem-section" id="mar">
     <h2 class="poem-title">Mar</h2>
     <div class="poem-body">Mãe, eu tenho medo do mar.
 Tá escuro e muito turbulento, eu não quero me afogar,
@@ -936,7 +1081,7 @@ Não ter peso ou pesar,
 Queria voltar para seu colo de ouro.</div>
   </article>
 
-  <article class="poem reveal" id="viagem">
+  <article class="poem-section" id="viagem">
     <h2 class="poem-title">Viagem</h2>
     <div class="poem-body">Viajo anos luz daqui...
 O anel que eu te dei vai ser esquecido, encontrado e derretido,
@@ -955,7 +1100,7 @@ Por mais que demore,
 Vamos ser regados no jardim por novos seres.</div>
   </article>
 
-  <article class="poem reveal" id="arte">
+  <article class="poem-section" id="arte">
     <h2 class="poem-title">Arte</h2>
     <div class="poem-body">Artistas são terrivelmente assombrados,
 Toda arte é derivada do pior para te encantar ou aterrorizar,
@@ -975,7 +1120,7 @@ Deem as mãos e comecem a se rastejar,
 À sua esquerda você sabe o que tem.</div>
   </article>
 
-  <article class="poem reveal" id="voce-sabe-quem">
+  <article class="poem-section" id="voce-sabe-quem">
     <h2 class="poem-title">Você Sabe Quem</h2>
     <div class="poem-body">Me diz mesmo se valeu a pena.
 Por que você me deixa assim?
@@ -991,7 +1136,7 @@ Como disse o Baco Exu do Blues:
 "Amor você é como o sol, ilumina o meu dia, mas queima a minha pele".</div>
   </article>
 
-  <article class="poem reveal" id="caixa">
+  <article class="poem-section" id="caixa">
     <h2 class="poem-title">Caixa</h2>
     <div class="poem-body">Aqui é sujo e bagunçado,
 Por mais que eu tente, não consigo organizar.
@@ -1006,7 +1151,7 @@ Faço qualquer barbaridade por um segundo de serotonina
 E no momento não existe consequência nem medo.</div>
   </article>
 
-  <article class="poem reveal" id="ponto-e-virgula">
+  <article class="poem-section" id="ponto-e-virgula">
     <h2 class="poem-title">Ponto e Vírgula</h2>
     <div class="poem-body">Essa pode ser minha última poesia,
 Não irei prometer mais. Sou uma bomba relógio. Se você está lendo, é porque uma parte de mim que não pode ser tocada muito menos fotografada
@@ -1014,7 +1159,7 @@ Foi materializada, e chegou até você de alguma forma.
 Começou estranho, porém não irei morrer. Quem faz arte não morre, ressuscita, mas não se engane, só ressuscita depois que morre.</div>
   </article>
 
-  <article class="poem reveal" id="torta-de-morango">
+  <article class="poem-section" id="torta-de-morango">
     <h2 class="poem-title">Torta de Morango</h2>
     <div class="poem-body">Amo nossas noites de torta de morango, nossas tardes de chás e as noites quentes de inverno quando saímos para tomar sorvete.
 Pega na minha mão e fala que ninguém nunca vai nos pegar.
@@ -1029,7 +1174,7 @@ E como elas se transformam e formam.
 Com você, filme de terror vira comédia e nós somos o júri exigente.</div>
   </article>
 
-  <article class="poem reveal" id="perdida">
+  <article class="poem-section" id="perdida">
     <h2 class="poem-title">Perdida</h2>
     <div class="poem-body">Perdida entre amores e obsessões,
 Se as pessoas soubessem...
@@ -1045,7 +1190,7 @@ Caio em seus braços, deito nos seu colo,
 Me deixe falar: me ajude a cortar as raízes podres.</div>
   </article>
 
-  <article class="poem reveal" id="balao">
+  <article class="poem-section" id="balao">
     <h2 class="poem-title">Balão</h2>
     <div class="poem-body">Me sinto leve como um balão,
 Película fina cheia de ar.
@@ -1062,7 +1207,7 @@ Nenhum vento vai me levar,
 Nenhum espinho vai me machucar.</div>
   </article>
 
-  <article class="poem reveal" id="limonada">
+  <article class="poem-section" id="limonada">
     <h2 class="poem-title">Limonada</h2>
     <div class="poem-body">Não tenha medo de se encontrar em mim,
 Antes de nos encontrarmos não éramos ninguém.
@@ -1075,7 +1220,7 @@ Vamos aprender a dançar no nosso ritmo,
 Se você quiser, a gente se encaixa.</div>
   </article>
 
-  <article class="poem reveal" id="decisao">
+  <article class="poem-section" id="decisao">
     <h2 class="poem-title">Decisão</h2>
     <div class="poem-body">Todos os dias, nós temos que tomar uma grande decisão quando abrimos os olhos,
 Mas é muita tentação.
@@ -1090,7 +1235,7 @@ Essa voz irritante é minha ou é a oficina do diabo funcionando?
 Mas minha mente nunca está vazia, principalmente quando estou sozinha.</div>
   </article>
 
-  <article class="poem reveal" id="notas">
+  <article class="poem-section" id="notas">
     <h2 class="poem-title">Notas</h2>
     <div class="poem-body">Minhas notas te notam
 Minhas notas te veem
@@ -1113,7 +1258,7 @@ Minhas notas te levam para o inferno
 Minhas notas te atormentam</div>
   </article>
 
-  <article class="poem reveal" id="flores">
+  <article class="poem-section" id="flores">
     <h2 class="poem-title">Flores</h2>
     <div class="poem-body">Tulipas da cor da cor
 Hoje eu vi uma tulipa, achei linda.
@@ -1131,7 +1276,7 @@ Não foi por querer, e eu fico sentida quando isso acontece.
 Mas não tem como limpar minhas digitais sem fazer mais bagunça.</div>
   </article>
 
-  <article class="poem reveal" id="todos-os-abusos">
+  <article class="poem-section" id="todos-os-abusos">
     <h2 class="poem-title">Todos os Abusos</h2>
     <div class="poem-body">Me liberta conseguir desabafar de forma genuína e poética sobre meus abusos, seus abusos, nossos abusos. Mas a minha cabeça dá um branco e o que resta é medo e nojo.
 Mas não deveria ser assim, né?
@@ -1149,7 +1294,7 @@ Pobre criança, começou a se machucar.
 Cada gota de sangue que escorreria era esperança de ficar mais limpa, como um sacrifício.</div>
   </article>
 
-  <article class="poem reveal" id="circo">
+  <article class="poem-section" id="circo">
     <h2 class="poem-title">Circo</h2>
     <div class="poem-body">Vamos desbravar todo o circo
 Colocamos nossos pecados e sapatos de palhaço, o nariz vermelho e a maquiagem feliz.
@@ -1162,7 +1307,7 @@ Vamos usar o ilusionismo para tentar escapar,
 Agora vem o mais esperado: o show de aberrações em que você apresenta o que te compõe temor, nojo, vergonha, inveja e desprezo.</div>
   </article>
 
-  <article class="poem reveal" id="amar">
+  <article class="poem-section" id="amar">
     <h2 class="poem-title">Amar</h2>
     <div class="poem-body">Amor? O que é amor? Amar algo?
 Amor próprio? Se amar? Amar alguém?
@@ -1179,7 +1324,7 @@ Você treme por dentro e por fora.
 Se não há sofrimento, não existe amor.</div>
   </article>
 
-  <article class="poem reveal" id="voce">
+  <article class="poem-section" id="voce">
     <h2 class="poem-title">Você</h2>
     <div class="poem-body">Tenho sensação que o espelho grita:
 "Você não me ver,
@@ -1199,7 +1344,7 @@ Você não se interessa,
 Você se ausenta."</div>
   </article>
 
-  <article class="poem reveal" id="identidade">
+  <article class="poem-section" id="identidade">
     <h2 class="poem-title">Identidade</h2>
     <div class="poem-body">Buscar aprovação
 Crise de identidade
@@ -1219,7 +1364,7 @@ Achar sentido cada vez que o que temos desgasta
 É uma corrida, precisar de propósito.</div>
   </article>
 
-  <article class="poem reveal" id="hipocrita">
+  <article class="poem-section" id="hipocrita">
     <h2 class="poem-title">Hipócrita</h2>
     <div class="poem-body">Sororidade e aceitação,
 Acho triste como só pode existir na Internet.
@@ -1234,7 +1379,7 @@ Somos egoístas, ignorantes e hipócritas.
 Não temos que normalizar isso.</div>
   </article>
 
-  <article class="poem reveal" id="liberdade">
+  <article class="poem-section" id="liberdade">
     <h2 class="poem-title">Liberdade</h2>
     <div class="poem-body">Queria te lembrar que eu perdi o medo do escuro,
 Não existe mais o temor de fechar os olhos, nem quando ando pelos corredores.
@@ -1246,7 +1391,7 @@ Escolher céu ou inferno é fácil,
 Lidar com a consequência de se manter que não.</div>
   </article>
 
-  <article class="poem reveal" id="conservador">
+  <article class="poem-section" id="conservador">
     <h2 class="poem-title">Conservador</h2>
     <div class="poem-body">Tento me descarregar em palavras e ruídos,
 Mas os cadeados e as correntes sempre voltam.
@@ -1260,7 +1405,7 @@ Que Deus é esse que você prega?
 Deus do ódio e do rancor, que apedreja e rejeita?</div>
   </article>
 
-  <article class="poem reveal" id="valores">
+  <article class="poem-section" id="valores">
     <h2 class="poem-title">Valores</h2>
     <div class="poem-body">Somos como urubus,
 Carniceiros, esperando a morte do próximo.
@@ -1273,7 +1418,7 @@ Eu sei que você tá tentando ser algo, mas seus pés estão afundando no asfalt
 Cada vez que você tenta dar um passo, afunda mais.</div>
   </article>
 
-  <article class="poem reveal" id="seres-organicos">
+  <article class="poem-section" id="seres-organicos">
     <h2 class="poem-title">Seres Orgânicos</h2>
     <div class="poem-body">Por mais que eu não queira ser um momento em sua vida, eu sei que sou que eu posso ir e não voltar.
 Isso serve para todos nós. É engraçado pensar em como somos patéticos, e colocamos pedras no caminho, sempre parece algo gigantesco, mas é o momento.
@@ -1282,7 +1427,7 @@ Pessoas mudam, e se resolvem.
 Não precisa viver no limite, o mundo não vai acabar, você dizer "não" não é o fim do mundo. Pessoas passam e repassam, tudo vira história e conhecimento. Aprenda a usar em prol de você, sempre há uma opção, por mais que não seja clara.</div>
   </article>
 
-  <article class="poem reveal" id="feliz">
+  <article class="poem-section" id="feliz">
     <h2 class="poem-title">Feliz</h2>
     <div class="poem-body">Não se permitir ser feliz é constante,
 Me sentir feliz e não conseguir verbalizar também.
@@ -1291,7 +1436,7 @@ Realmente, felicidade é escassa, e não saber o que é ou como sentir me deixa 
 Acostumada com apatia e desgraça, isso desgasta. Sinto e não sei aproveitar, mesmo que não seja com tanta frequência.</div>
   </article>
 
-  <article class="poem reveal" id="tres">
+  <article class="poem-section" id="tres">
     <h2 class="poem-title">Três</h2>
     <div class="poem-body">Eu nunca fui a amiga do meio,
 Nunca fui a disputada do trio,
@@ -1302,7 +1447,7 @@ Já passei em tantos trios, nunca fui a um e nunca serei, não por falta de esfo
 Normalmente, a número três só está ali para cobrir uma vaga, vaga.</div>
   </article>
 
-  <article class="poem reveal" id="renascimento">
+  <article class="poem-section" id="renascimento">
     <h2 class="poem-title">Renascimento</h2>
     <div class="poem-body">Idealizo o meu túmulo e não faço ideia do que está escrito na lápide,
 Vou rabiscar e escrever até virar pó e, com as minhas lágrimas, virar argila para me remoldar, como se eu fosse Deus e fizesse a Lilith e apagasse a falha existência dela com a Eva, com esperanças de melhora e submissão.
@@ -1310,7 +1455,7 @@ Porém sabendo o que vai acontecer e como vai se repetir, e como vai ser doloros
 E assim volto para o começo.</div>
   </article>
 
-  <article class="poem reveal" id="abstrato">
+  <article class="poem-section" id="abstrato">
     <h2 class="poem-title">Abstrato</h2>
     <div class="poem-body">Isso tudo é uma forma abstrata de se expressar.
 Muitas vezes, incompreendida e solo.
@@ -1319,7 +1464,7 @@ Se você tocar, irá sentir os batimentos e talvez o aconchego quentinho.
 Somos um quebra-cabeça, sempre encontrando peças e perdendo outras, há algumas que, quando encontramos, ficamos perplexos com tamanha preciosidade e esquecimento.</div>
   </article>
 
-  <article class="poem reveal" id="armadura">
+  <article class="poem-section" id="armadura">
     <h2 class="poem-title">Armadura</h2>
     <div class="poem-body">Me diz quantas versões você tem?
 É tão simples mudar por um momento.
@@ -1329,7 +1474,7 @@ Olhe o semblante de cada uma e tente escolher a certa, mas sem chorar, você nã
 Você conquistou tantas peles que não se lembra mais da verdadeira.</div>
   </article>
 
-  <article class="poem reveal" id="proximo">
+  <article class="poem-section" id="proximo">
     <h2 class="poem-title">Próximo</h2>
     <div class="poem-body">Me sinto usada todas as vezes que você me chama para ajudar a enterrar o estrago que você faz.
 Você me usa para tentar se sentir melhor, cada vez que você destrói outra pessoa.
@@ -1339,7 +1484,7 @@ Isso está mais próximo do que eu possa pensar, e eu espero que esteja mesmo.
 Os meus dedos estão sangrando de tanto cavar, e cavo o mais fundo possível para você me enterrar.</div>
   </article>
 
-  <article class="poem reveal" id="pretinha">
+  <article class="poem-section" id="pretinha">
     <h2 class="poem-title">Pretinha</h2>
     <div class="poem-body">Via você no ponto de ônibus perto da minha escola,
 Todos os dias fazia questão de passar na sua frente com a esperança que você me notasse.
@@ -1349,26 +1494,26 @@ Finalmente tive coragem de te chamar, on-line, claro.
 Fui direto ao ponto e me declarei, sem medo de me achar louca e alucinada, citei uma música do Seu Jorge: "Pretinha, faço tudo pelo nosso amor". Sim, tomei um puta fora. Já tinha trilhado nosso destino, todas as vezes que a via.</div>
   </article>
 
-  <article class="poem reveal" id="lugar-nenhum">
+  <article class="poem-section" id="lugar-nenhum">
     <h2 class="poem-title">Lugar Nenhum</h2>
     <div class="poem-body">Estou cansada de falar, explicar de diferentes formas, tentando não fazer ser repetitivo, mas você não me dá palco, muito menos tenta me entender.
 Continuo alugando lugar nenhum e sendo fantasma, apenas fazendo você sentir pequenos calafrios.</div>
   </article>
 
-  <article class="poem reveal" id="responsabilidade">
+  <article class="poem-section" id="responsabilidade">
     <h2 class="poem-title">Responsabilidade</h2>
     <div class="poem-body">A vida não me deu tempo para ser imatura ou irresponsável.
 Desde que criei consciência, conheci as consequências.
 Tudo que fazemos gera consequências, boas ou ruins, e se torna mais difícil ter que projetar seus passos a cada milissegundo, sem poder cometer deslizes.</div>
   </article>
 
-  <article class="poem reveal" id="desabafo">
+  <article class="poem-section" id="desabafo">
     <h2 class="poem-title">Desabafo</h2>
     <div class="poem-body">Muitas vezes é torturante ler o que sai de mim, do mesmo jeito que é aliviante quando sai, e eu sei que é mais ainda para os próximos.
 Não me pergunte, não me julgue, não julgue ele ou ela. Tudo que você lê aqui e te alfineta é um problema interno seu, resolva ou viva com ele.</div>
   </article>
 
-  <article class="poem reveal" id="opio">
+  <article class="poem-section" id="opio">
     <h2 class="poem-title">Ópio</h2>
     <div class="poem-body">Estou acabando com a minha vida, surto e rapidamente está tudo escuro.
 A cada dilúvio, surge um novo mundo, que de novo não tem absolutamente nada.
@@ -1378,13 +1523,13 @@ Pelo menos, o Ópio está do meu lado. Ninguém percebe a melancolia, o medo, a 
 A cama se tornou uma cova, e os cobertores e travesseiros, a terra.</div>
   </article>
 
-  <article class="poem reveal" id="titulo">
+  <article class="poem-section" id="titulo">
     <h2 class="poem-title">Título</h2>
     <div class="poem-body">Já tem algumas horas que estou olhando para você e não consegui imaginar nem um título.
 Estou moendo o meu cérebro para extrair algo, mas só vejo uma tela preta, ouço zumbidos e sinto peso.</div>
   </article>
 
-  <article class="poem reveal" id="suco-de-vidro">
+  <article class="poem-section" id="suco-de-vidro">
     <h2 class="poem-title">Suco de Vidro</h2>
     <div class="poem-body">Faça o meu corpo de tela.
 Me dê cor enquanto fica deslumbrado com as curvas e perdido com o enigma.
@@ -1393,8 +1538,8 @@ Sem colocar as mãos, ou vai me romper ou corromper, por mais que o meu corpo se
 Nunca beberá da minha fonte, sai apenas suco de vidro. Mas se tiver coragem, beba e conhecerá a verdadeira explosão interna.</div>
   </article>
 
-  <article class="poem reveal" id="fases-2">
-    <h2 class="poem-title">Fases <span style="font-size:.7em;color:var(--muted)">II</span></h2>
+  <article class="poem-section" id="fases-2">
+    <h2 class="poem-title">Fases <span style="font-size:.75em;color:var(--muted);font-family:'EB Garamond',serif;font-style:italic">II</span></h2>
     <div class="poem-body">Faces, fases, falhas, familiares...
 Quando desperto ao amanhecer, não sou ninguém, estática na cama na mesma posição que dormi.
 Queria falar "logo me levanto", mas não é assim, demora horas.
@@ -1403,7 +1548,7 @@ Dou um jeito, faço um delineado para ressaltar um olhar confiante, batom para e
 Me sinto outra pessoa, posso fazer tudo aquilo que não tenho coragem, porém me espanta, mas a maquiagem disfarçar, assim como o sorriso e a postura, aparecer e falar em bom tom.</div>
   </article>
 
-  <article class="poem reveal" id="aflicao">
+  <article class="poem-section" id="aflicao">
     <h2 class="poem-title">Aflição</h2>
     <div class="poem-body">Não consigo me desfazer de todas as marcas de nossas vidas passadas.
 Não quero pensar no fim do mundo, não quero ceder ao peso do inferno.
@@ -1413,7 +1558,7 @@ Desgraça sempre aconteceu, mas agora temos uma noção maior.
 É ridículo existir com tanta negligência divina.</div>
   </article>
 
-  <article class="poem reveal" id="ampulheta">
+  <article class="poem-section" id="ampulheta">
     <h2 class="poem-title">Ampulheta</h2>
     <div class="poem-body">Vivendo em função da morte
 Já chegou a virada de ano e, com ela, todos viramos
@@ -1422,7 +1567,7 @@ Quem vai ser descartado da série? Por pura ignorância ou obra do destino? Não
 Não tem como pular 30 segundos para frente ou para trás.</div>
   </article>
 
-  <article class="poem reveal" id="pedra">
+  <article class="poem-section" id="pedra">
     <h2 class="poem-title">Pedra</h2>
     <div class="poem-body">Quero te esquecer ou não te envolver em algo que eu faça,
 Todas as vezes que eu me distraio, tropeço em você.
@@ -1432,7 +1577,7 @@ Quando vejo luz, me escondo, sinto dificuldade em engolir, em te engolir.
 Tem uma parte de mim que não quer ser salva e insiste.</div>
   </article>
 
-  <article class="poem reveal" id="chuva">
+  <article class="poem-section" id="chuva">
     <h2 class="poem-title">Chuva</h2>
     <div class="poem-body">Noite chuvosa, né? Essas noites me lembram de comprimidos, lágrimas, hematomas, bebidas e sangue.
 Estou sentada no mesmo banheiro, banheiro que foi palco muitas vezes, e eu tenho tudo aqui em minhas mãos. Tá sendo difícil e impulsivo, eu não posso ter uma recaída, tem muitos obstáculos.
@@ -1442,7 +1587,7 @@ Eu sinto raiva e, em algum momento, me peguei puxando os meus cabelos.
 Eu sou uma puta egoísta, mas eu acho que não mereço isso, eu acho que é proposital, você me conhece.</div>
   </article>
 
-  <article class="poem reveal" id="me-chamam-de-melancolia">
+  <article class="poem-section" id="me-chamam-de-melancolia">
     <h2 class="poem-title">Me Chamam de Melancolia</h2>
     <div class="poem-body">Ouço o eco que a minha voz faz dentro de mim.
 Me encho quando estou com você e sinto que são pedacinhos temporários, faço um quebra-cabeça e, lentamente, as peças vão sumindo.
@@ -1450,13 +1595,13 @@ Melancolia que nunca passa, mas eu penso em todas as formas de te matar, os luga
 Cada detalhe malicioso, e o prazer que eu sentia só de pensar o quanto você iria sofrer.</div>
   </article>
 
-  <article class="poem reveal" id="mais-um-dia">
+  <article class="poem-section" id="mais-um-dia">
     <h2 class="poem-title">Mais Um Dia</h2>
     <div class="poem-body">Hoje acordei com necessidade de sumir, o meu corpo não me obedece e eu sei que tenho muitas coisas para fazer.
 Mas a parte de mim que quer desistir grita mais forte, o meu quarto tá bagunçado e isso reflete muito em mim.</div>
   </article>
 
-  <article class="poem reveal" id="anestesia">
+  <article class="poem-section" id="anestesia">
     <h2 class="poem-title">Anestesia</h2>
     <div class="poem-body">Você me ama?
 Ok, você diz que sim, mas eu não sinto.
@@ -1465,56 +1610,74 @@ Amor que não toca, mas machuca.
 No momento, me encontro perdida, eu não quero ter que explicar algo que nem eu mesma sei ou sobre os meus pequenos versos, o lugar onde você se encontra.</div>
   </article>
 
-</main>
+</div><!-- /content -->
 
 <footer>
-  <p class="f-title">Tristeza Faz <em>Parte</em></p>
+  <p class="footer-title">Tristeza Faz p<span class="r">ARTE</span></p>
   <p>Nani Ely · Editora Viseu, 2024</p>
-  <p style="margin-top:24px">© 2024 Nani Ely. Todos os direitos reservados.</p>
+  <p style="margin-top:20px">© 2024 Nani Ely. Todos os direitos reservados.</p>
 </footer>
 
-<button id="top-btn" aria-label="Voltar ao topo" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<button id="top-btn" aria-label="Voltar ao topo">↑</button>
 
 <script>
-// progress bar
+// ── progress bar ──
 const bar = document.getElementById('bar');
-window.addEventListener('scroll', () => {
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  bar.style.width = pct + '%';
-  document.getElementById('top-btn').classList.toggle('show', h.scrollTop > 400);
-}, {passive:true});
+const topBtn = document.getElementById('top-btn');
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  bar.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  topBtn.classList.toggle('show',h.scrollTop>500);
+},{passive:true});
+topBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
-// reveal on scroll
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
-}, {threshold:.08, rootMargin:'0px 0px -40px 0px'});
+// ── reveal on scroll ──
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});
+},{threshold:.06,rootMargin:'0px 0px -30px 0px'});
 
-document.querySelectorAll('.reveal').forEach(el => {
-  el.classList.add('poem'); // reuse poem anim
-  observer.observe(el);
+document.querySelectorAll('.poem-section,.reveal').forEach(el=>io.observe(el));
+
+// ── build TOC ──
+const poems=document.querySelectorAll('article.poem-section');
+const grid=document.getElementById('toc-grid');
+const pageNums={
+  'desilusao':15,'amortesalva':16,'parte-de-mim':17,'demonios':18,
+  'nao-vou-superar':19,'lorde':20,'acabou':21,'promete':22,'nevoeiro':23,
+  'po':24,'autocontrole':25,'cristal':26,'nuvem':27,'fases-1':28,
+  'poeira':29,'desconexao':30,'por-que':31,'canto-da-cama':32,'conforto':33,
+  'poco':34,'va':35,'posse':36,'beijo':37,'umbral':38,'paralisia':39,
+  'submissao':40,'suicidio':41,'dependencia-emocional':42,'tudo-igual':43,
+  'equilibrio':44,'mar':45,'viagem':46,'arte':47,'voce-sabe-quem':48,
+  'caixa':49,'ponto-e-virgula':50,'torta-de-morango':51,'perdida':52,
+  'balao':53,'limonada':54,'decisao':55,'notas':56,'flores':57,
+  'todos-os-abusos':58,'circo':59,'amar':60,'voce':61,'identidade':62,
+  'hipocrita':63,'liberdade':64,'conservador':65,'valores':66,
+  'seres-organicos':67,'feliz':68,'tres':69,'renascimento':70,
+  'abstrato':71,'armadura':72,'proximo':73,'pretinha':74,
+  'lugar-nenhum':75,'responsabilidade':76,'desabafo':77,'opio':78,
+  'titulo':79,'suco-de-vidro':80,'fases-2':81,'aflicao':82,
+  'ampulheta':83,'pedra':84,'chuva':85,'me-chamam-de-melancolia':86,
+  'mais-um-dia':87,'anestesia':88
+};
+
+poems.forEach(p=>{
+  const title=p.querySelector('.poem-title').textContent.trim();
+  const div=document.createElement('div');
+  div.className='toc-item';
+  const a=document.createElement('a');
+  a.href='#'+p.id;a.textContent=title;
+  const dots=document.createElement('span');dots.className='dots';
+  const pnum=document.createElement('span');
+  pnum.className='pnum';pnum.textContent=pageNums[p.id]||'';
+  div.append(a,dots,pnum);
+  grid.appendChild(div);
 });
 
-// TOC
-const tocEl = document.getElementById('toc');
-const tocList = document.getElementById('toc-list');
-const poems = document.querySelectorAll('article.poem');
-
-poems.forEach(p => {
-  const title = p.querySelector('.poem-title').textContent.trim();
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  a.href = '#' + p.id;
-  a.textContent = title;
-  a.addEventListener('click', () => tocEl.classList.remove('open'));
-  li.appendChild(a);
-  tocList.appendChild(li);
+// ── TOC header button scrolls to sumario ──
+document.getElementById('toc-btn').addEventListener('click',()=>{
+  document.getElementById('sumario').scrollIntoView({behavior:'smooth'});
 });
-
-document.getElementById('toc-btn').addEventListener('click', () => tocEl.classList.add('open'));
-document.getElementById('toc-close').addEventListener('click', () => tocEl.classList.remove('open'));
-tocEl.addEventListener('click', e => { if(e.target === tocEl) tocEl.classList.remove('open'); });
-document.addEventListener('keydown', e => { if(e.key === 'Escape') tocEl.classList.remove('open'); });
 </script>
 </body>
 </html>
